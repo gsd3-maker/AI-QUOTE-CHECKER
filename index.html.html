@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI QUOTE CHECKER V27 • Universal Quote Reader</title>
+<style>
+:root{
+  --navy:#0B3C91; --navy2:#082f72; --orange:#F28C28; --green:#16845B;
+  --red:#C94B4B; --bg:#F5F7FB; --line:#E4E8F0; --text:#182230; --muted:#6B7482;
+  --white:#fff; --shadow:0 8px 24px rgba(20,45,90,.08); --radius:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:var(--navy2);color:white;padding:22px 16px;position:fixed;inset:0 auto 0 0}
+.brand{display:flex;gap:11px;align-items:center;padding:4px 8px 24px}
+.logo{width:38px;height:38px;border-radius:11px;background:white;color:var(--navy);display:grid;place-items:center;font-weight:900}
+.brand b{font-size:15px}.brand span{display:block;font-size:11px;opacity:.7;margin-top:2px}
+.nav{display:grid;gap:7px}.nav button{border:0;background:transparent;color:#dce8ff;text-align:left;padding:12px 13px;border-radius:10px;font-weight:600}
+.nav button.active,.nav button:hover{background:rgba(255,255,255,.12);color:white}
+.side-note{position:absolute;left:16px;right:16px;bottom:18px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;font-size:11px;line-height:1.5;color:#bcd0f5}
+.main{margin-left:245px;width:calc(100% - 245px);padding:26px 32px 50px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:24px}
+h1{margin:0;font-size:26px}.sub{color:var(--muted);font-size:13px;margin-top:5px}
+.btn{border:0;border-radius:10px;padding:11px 15px;font-weight:700}
+.btn.primary{background:var(--navy);color:#fff}.btn.orange{background:var(--orange);color:#fff}.btn.light{background:white;border:1px solid var(--line);color:var(--text)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:17px;box-shadow:var(--shadow)}
+.stat .label{color:var(--muted);font-size:12px}.stat strong{display:block;font-size:25px;margin-top:7px}.stat small{color:var(--muted)}
+.toolbar{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow);margin-bottom:25px}
+.search{flex:1;min-width:250px;position:relative}.search input{width:100%;padding:11px 13px 11px 38px;border:1px solid var(--line);border-radius:10px;outline:0}.search span{position:absolute;left:13px;top:10px;color:#8992a1}
+select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--text)}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}.section-title h2{font-size:17px;margin:0}.count{font-size:12px;color:var(--muted)}
+.case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.case{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:17px;box-shadow:var(--shadow);transition:.15s;cursor:pointer}
+.case:hover{transform:translateY(-2px);border-color:#cbd7ed}
+.case-head{display:flex;justify-content:space-between;gap:8px}.case-icon{font-size:25px}
+.case h3{margin:12px 0 6px;font-size:15px;line-height:1.35}.id{font-size:11px;color:var(--muted)}
+.meta{display:flex;gap:7px;flex-wrap:wrap;margin:13px 0}.pill{font-size:11px;background:#F2F5FA;border-radius:99px;padding:5px 8px;color:#536071}
+.status{font-size:11px;border-radius:99px;padding:5px 9px;font-weight:700;white-space:nowrap}.done{background:#E8F6F0;color:var(--green)}.doing{background:#FFF3DF;color:#A9630C}.draft{background:#EEF1F5;color:#667080}
+.case-foot{border-top:1px solid var(--line);padding-top:11px;display:flex;justify-content:space-between;color:var(--muted);font-size:11px}
+.empty{padding:45px;text-align:center;background:#fff;border:1px dashed #ccd4e1;border-radius:var(--radius);color:var(--muted)}
+.hidden{display:none!important}
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.back{color:var(--navy);font-weight:700;border:0;background:transparent;padding:0;margin-bottom:16px}
+.case-title{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}.case-title h1{font-size:23px}
+.detail-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-top:16px}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:17px}.info{padding:12px;background:#F7F9FC;border-radius:11px}.info label{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.info b{font-size:13px}
+.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin-top:20px}.tab{border:0;background:transparent;padding:12px 13px;color:var(--muted);font-weight:700}.tab.active{color:var(--navy);border-bottom:2px solid var(--navy)}
+.tabcontent{padding-top:18px}.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{padding:14px;background:#F7F9FC;border-radius:12px}.metric small{color:var(--muted)}.metric b{display:block;font-size:19px;margin-top:5px}
+.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.table th{background:#F7F9FC}
+.alert{padding:12px;border-radius:11px;margin:9px 0;font-size:12px}.alert.warn{background:#FFF5E6;color:#80510D}.alert.ok{background:#EAF7F1;color:#176846}.alert.info{background:#EEF4FF;color:#194E9A}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;outline:0}.field textarea{min-height:90px;resize:vertical}.full{grid-column:1/-1}.modal{position:fixed;inset:0;background:rgba(11,24,45,.48);display:grid;place-items:center;padding:20px;z-index:20}.modalbox{background:#fff;width:min(760px,100%);max-height:90vh;overflow:auto;border-radius:18px;padding:23px;box-shadow:0 20px 50px rgba(0,0,0,.2)}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.close{border:0;background:#F1F3F6;width:34px;height:34px;border-radius:50%;font-size:18px}
+.upload{border:2px dashed #cdd6e5;border-radius:13px;padding:25px;text-align:center;margin-top:10px;background:#FAFBFD}.upload input{margin-top:10px}.footer-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.file-list{display:grid;gap:8px;margin-top:12px}.file-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;background:#F7F9FC;border:1px solid var(--line);border-radius:10px}.file-main{min-width:0}.file-name{font-weight:700;font-size:12px;word-break:break-word}.file-meta{font-size:11px;color:var(--muted);margin-top:3px}.file-actions{display:flex;gap:6px;flex-shrink:0}.btn.sm{padding:7px 9px;font-size:11px}
+.ai-box{border-left:4px solid var(--navy);background:#F3F7FF;padding:15px;border-radius:10px;line-height:1.55;font-size:13px}
+@media(max-width:1050px){.case-grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.detail-grid{grid-template-columns:1fr}}
+@media(max-width:750px){.sidebar{width:70px}.brand div:last-child,.nav button span,.side-note{display:none}.brand{justify-content:center}.main{margin-left:70px;width:calc(100% - 70px);padding:20px}.case-grid,.stats,.form-grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+
+.contract-tab{font-weight:800}.selected-row{outline:2px solid #cfe7d6;outline-offset:-2px;background:#f7fcf8}.badge.ok{background:#eaf8ef;color:#177245;border:1px solid #bfe5ca}.badge.warn{background:#fff4df;color:#9a5a00;border:1px solid #f2d39b}
+
+/* V7 – giao diện gọn, ưu tiên thao tác */
+.main{padding:18px 24px 36px}
+.back{margin-bottom:10px;font-size:13px}
+.case-title{padding:10px 0 8px}
+.case-title h1{font-size:20px}
+.case-title .sub{font-size:12px}
+.info-grid{grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.info{padding:9px 11px;border-radius:9px}
+.info label{font-size:10px;margin-bottom:2px}.info b{font-size:12px}
+.tabs{margin-top:12px;gap:2px;position:sticky;top:0;z-index:8;background:var(--bg);padding-top:4px;overflow-x:auto;white-space:nowrap}
+.tab{padding:9px 10px;font-size:12px}
+.tabcontent{padding-top:12px}
+.panel{padding:14px;border-radius:12px}
+.metric-grid{gap:8px}.metric{padding:10px}.metric b{font-size:16px;margin-top:3px}
+.table th,.table td{padding:8px 9px}
+.alert{padding:9px 11px;margin:7px 0}
+.contract-panel{padding:14px!important}
+.contract-panel .form-grid{grid-template-columns:repeat(3,1fr);gap:9px!important;margin-top:10px!important}
+.contract-panel .field label{font-size:11px;margin-bottom:4px}
+.contract-panel .field input,.contract-panel .field select,.contract-panel .field textarea{padding:8px 9px;border-radius:8px;font-size:12px}
+.contract-panel .field textarea{min-height:58px}
+.contract-panel .footer-actions{margin-top:10px}
+.contract-panel .file-list{margin-top:8px}
+.contract-panel .file-row{padding:8px 10px}
+.contract-panel .btn{padding:9px 12px;font-size:12px}
+.contract-panel h3{font-size:16px}
+#inlineContract{margin-top:12px!important}
+@media(max-width:1050px){.info-grid{grid-template-columns:repeat(2,1fr)}.contract-panel .form-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:750px){.main{padding:14px}.info-grid{grid-template-columns:1fr 1fr}.contract-panel .form-grid{grid-template-columns:1fr}}
+
+.select-card{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-top:8px}.select-card.chosen{border-color:#bfe5ca;background:#f7fcf8}
+.source-chip{display:inline-flex;align-items:center;gap:5px;background:#eef4ff;color:#194e9a;border:1px solid #d4e1fb;border-radius:99px;padding:4px 8px;font-size:10px;font-weight:700}.evidence{background:#fbfcfe;border:1px solid #e1e7f0;border-radius:10px;padding:10px;font-size:11px}.confidence{font-size:10px;color:#5e6877}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.select-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid #e0e6ef;border-radius:11px;background:#fff;margin-top:8px}.select-card.chosen{border-color:#bfe5ca;background:#f7fcf8}</style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">AI</div><div><b>QUOTE CHECKER</b><span>V27 • Universal Quote Reader</span></div></div>
+  <nav class="nav">
+    <button class="active" onclick="showLibrary()">🏠 <span>Kho hồ sơ</span></button>
+    <button onclick="openNewCase()">＋ <span>Tạo đánh giá mới</span></button>
+  </nav>
+  <div class="side-note">Mỗi lần đánh giá = một hồ sơ riêng.<br>Hồ sơ được tổ chức theo tháng/năm để dễ tra cứu.</div>
+</aside>
+
+<main class="main">
+<section id="libraryView">
+  <div class="top">
+    <div><h1>Kho hồ sơ đánh giá NCC / Nhà thầu</h1><div class="sub">Quản lý, tìm kiếm và mở lại toàn bộ các lần đánh giá theo từng hạng mục.</div></div>
+    <button class="btn orange" onclick="openNewCase()">＋ Tạo đánh giá mới</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="label">TỔNG HỒ SƠ</div><strong id="sTotal">0</strong><small>tất cả thời gian</small></div>
+    <div class="stat"><div class="label">ĐANG PHÂN TÍCH</div><strong id="sDoing">0</strong><small>AI / người dùng đang xử lý</small></div>
+    <div class="stat"><div class="label">ĐÃ PHÂN TÍCH</div><strong id="sDone">0</strong><small>có kết quả so sánh</small></div>
+    <div class="stat"><div class="label">NCC / NHÀ THẦU</div><strong id="sSuppliers">0</strong><small>tổng lượt trong hồ sơ</small></div>
+  </div>
+  <div class="toolbar">
+    <div class="search"><span>🔎</span><input id="search" oninput="renderCases()" placeholder="Tìm hạng mục, mã hồ sơ, NCC..."></div>
+    <select id="yearFilter" onchange="renderCases()"><option value="all">Tất cả năm</option></select>
+    <select id="monthFilter" onchange="renderCases()"><option value="all">Tất cả tháng</option></select>
+    <select id="typeFilter" onchange="renderCases()"><option value="all">Tất cả loại</option><option>Sửa chữa</option><option>Mua sắm</option><option>Dịch vụ</option><option>Nhà thầu</option><option>NCC</option><option>Bảo trì</option><option>Thuê ngoài</option><option>Khác</option></select>
+    <select id="statusFilter" onchange="renderCases()"><option value="all">Tất cả trạng thái</option><option>Đang phân tích</option><option>Đã phân tích</option><option>Bản nháp</option><option>Đã đề xuất</option></select>
+  </div>
+  <div id="caseLibrary"></div>
+</section>
+
+<section id="detailView" class="hidden"></section>
+</main>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modalbox">
+    <div class="modalhead"><div><h2 style="margin:0">Tạo hồ sơ đánh giá mới</h2><div class="sub">Tạo một case riêng cho từng hạng mục / yêu cầu.</div></div><button class="close" onclick="closeModal()">×</button></div>
+    <div class="form-grid">
+      <div class="field full"><label>Tên hạng mục / yêu cầu *</label><input id="fTitle" placeholder="VD: Dịch vụ kiểm soát côn trùng"></div>
+      <div class="field"><label>Mẫu đánh giá</label><select id="fTemplate" onchange="applyTemplateToForm()"><option value="custom">Tự do / Hạng mục mới</option><option value="cleaning">Dịch vụ giặt thảm / vệ sinh</option><option value="forklift">Sửa chữa xe nâng / thiết bị</option><option value="pest">Dịch vụ kiểm soát côn trùng</option><option value="maintenance">Bảo trì / kiểm định</option><option value="procurement">Mua sắm hàng hóa / vật tư</option><option value="outsourcing">Thuê ngoài dịch vụ</option></select></div>
+      <div class="field"><label>Phạm vi chuẩn / dữ liệu cần đối chiếu</label><input id="fScope" placeholder="Tự điền theo mẫu; có thể chỉnh"></div>
+      <div class="field"><label>Ngày đánh giá *</label><input id="fDate" type="date"></div>
+      <div class="field"><label>Loại đánh giá</label><select id="fType"><option>Sửa chữa</option><option>Mua sắm</option><option>Dịch vụ</option><option>Nhà thầu</option><option>NCC</option><option>Bảo trì</option><option>Thuê ngoài</option><option>Khác</option></select></div>
+      <div class="field"><label>Số NCC / nhà thầu</label><input id="fSuppliers" type="number" min="1" value="3"></div>
+      <div class="field"><label>Trạng thái ban đầu</label><select id="fStatus"><option>Bản nháp</option><option>Đang phân tích</option></select></div>
+      <div class="field full"><label>Ghi chú / phạm vi yêu cầu</label><textarea id="fNote" placeholder="Mô tả ngắn yêu cầu, địa điểm, phạm vi hoặc tiêu chí cần lưu ý..."></textarea></div>
+      <div class="field full">
+        <div class="alert info" style="margin:0">
+          <b>📎 Báo giá / tài liệu sẽ upload ở bước phân tích.</b><br>
+          Tạo hồ sơ trước → vào <b>Hồ sơ & báo giá</b> → upload file → hệ thống <b>đọc, chuẩn hóa và so sánh</b> dữ liệu. 
+          File được lưu kèm hồ sơ để tra cứu về sau.
+        </div>
+      </div>
+    </div>
+    <div class="footer-actions"><button class="btn light" onclick="closeModal()">Hủy</button><button class="btn primary" onclick="createCase()">Tạo hồ sơ & mở hồ sơ</button></div>
+  </div>
+</div>
+
+<script>
+const KEY='AI_QUOTE_CHECKER_V50_CASES';
+const VERSION='V50';
+const LEGACY_KEY='AI_QUOTE_CHECKER_V40_CASES';
+const demo=[
+ {id:'QTC-2026-10-001',title:'Dịch vụ giặt thảm',date:'2026-10-01',type:'Dịch vụ',suppliers:4,status:'Đã phân tích',note:'Đánh giá 4 báo giá dịch vụ giặt thảm và giặt ghế văn phòng. Hạng mục chuẩn: 350 m² thảm và 400 ghế.',supplierNames:['CÔNG TY CP TM VIỆTCLEAN','CÔNG TY TNHH THƯƠNG MẠI DỊCH VỤ VIỆT PHÁT CLEAN','CÔNG TY TNHH TMDV TRANG TRÍ NỘI THẤT ĐÔ THỊ VÀNG','CÔNG TY TNHH TÔNG VỆ SINH VIỆT'],quotes:[
+  {name:'CÔNG TY CP TM VIỆTCLEAN',beforeVat:8400000,vat:672000,total:9072000,time:'Không nêu',warranty:'Không nêu',payment:'Thanh toán 100% sau 5 ngày kể từ khi nhận được hóa đơn tài chính hợp lệ.',validity:'Không nêu',location:'Không nêu',items:[
+    ['Giặt thảm văn phòng',350,8000,2800000],['Giặt ghế nhân viên',400,14000,5600000]
+  ],notes:['Báo giá ngày 24/11/2025.','Giá đã bao gồm nhân công, vận chuyển máy móc thiết bị, hóa chất dụng cụ vệ sinh và 8% VAT.','Hóa chất: Dyma Prep, xuất xứ Anh.','Máy móc: máy giặt thảm công nghiệp, máy hút bụi–nước công nghiệp, máy thổi gió con sò.','Quy trình gồm vệ sinh sơ bộ, hút bụi/tẩy đốm, giặt bằng máy chuyên dụng, hút nước bẩn, sắp xếp lại và nghiệm thu.','Nếu tách khối lượng hoặc làm khác ngày, chi phí sẽ được báo lại.']},
+  {name:'CÔNG TY TNHH THƯƠNG MẠI DỊCH VỤ VIỆT PHÁT CLEAN',beforeVat:11950000,vat:956000,total:12906000,time:'Khoảng 6–8 tiếng / 1 ngày',warranty:'03 ngày',payment:'Chuyển khoản sau khi nghiệm thu, bàn giao đầy đủ hóa đơn chứng từ.',validity:'Không nêu',location:'Nhà Bè, TP.HCM',items:[
+    ['Vệ sinh thảm văn phòng – 350m²',350,9000,3150000],['Giặt ghế văn phòng',400,22000,8800000]
+  ],notes:['Báo giá ngày 24/11/2025.','Thời gian vệ sinh 08:00–17:00; hoàn thành khoảng 6–8 tiếng.','Giá đã bao gồm di chuyển, máy móc, nhân công.','Ngoài giờ buổi tối phụ thu 30% trên tổng hóa đơn.','Công trình phải bàn giao không còn thi công và đủ điện, nước.','Bảo hành dịch vụ 3 ngày; nếu có điểm chưa hài lòng có thể yêu cầu xử lý lại miễn phí.','Quy trình giặt thảm: dọn khu vực, giặt bằng máy LIFE CLEAN, hút nước dơ, thổi khô, di chuyển đồ đạc và nghiệm thu.']},
+  {name:'CÔNG TY TNHH TMDV TRANG TRÍ NỘI THẤT ĐÔ THỊ VÀNG',beforeVat:14700000,vat:1176000,total:15876000,time:'Không nêu',warranty:'Không nêu',payment:'Không nêu',validity:'Không nêu',location:'KCN Hiệp Phước, TP.HCM',items:[
+    ['Giặt thảm',350,10000,3500000],['Giặt ghế văn phòng',400,28000,11200000]
+  ],notes:['Báo giá ngày 24/11/2025.','Đơn giá đã bao gồm chi phí nhân công, hóa chất, di chuyển và hoàn thiện; chưa bao gồm 8% VAT.','VAT tính: 1.176.000đ; tổng sau VAT: 15.876.000đ.','Quy trình: phun hóa chất, chà bằng máy chuyên dụng, phun nước sạch và hút chất dơ, sấy khô, phun hóa chất khử mùi/chống bám dơ.','Sử dụng hóa chất 341 CARPET EXIT GOODMAID PRO và máy NUMATICH Anh Quốc.']},
+  {name:'CÔNG TY TNHH TÔNG VỆ SINH VIỆT',beforeVat:8100000,vat:648000,total:8748000,time:'Không nêu',warranty:'14 ngày',payment:'Chuyển khoản hoặc tiền mặt',validity:'Không nêu',location:'Không nêu',items:[
+    ['Giặt thảm văn phòng',350,6000,2100000],['Giặt ghế văn phòng',400,15000,6000000]
+  ],notes:['Báo giá ngày 24/11/2025.','Bảo hành sau khi giặt 14 ngày; hotline bảo hành 070.3255.407.','Sử dụng dung dịch Goodmaid của Malaysia.','Quy trình gồm hút bụi/rác, pha dung dịch theo từng loại thảm/ghế, xử lý điểm bẩn, giặt bằng máy chuyên dụng, hút nước bẩn, xử lý khuẩn/nấm/mạt bụi và dùng hơi nước nóng để khử khuẩn/khử mùi.','Sau vệ sinh để thảm khô tự nhiên khoảng 2–4 giờ.']}
+ ]},
+ {id:'QTC-2026-09-001',title:'Sửa chữa xe nâng GS-6868',date:'2026-09-21',type:'Sửa chữa',suppliers:3,status:'Đã phân tích',note:'Đối chiếu 3 báo giá sửa chữa xe nâng theo phạm vi linh kiện, giá, thời gian thực hiện, bảo hành và điều kiện thương mại.',supplierNames:['CÔNG TY TNHH MTV TM DV HOÀNG GIA LÂM','CÔNG TY CP XE NÂNG KHANG NAM','CÔNG TY TNHH TM DV FORKLIFT THIÊN PHÚC'],quotes:[
+  {name:'CÔNG TY TNHH MTV TM DV HOÀNG GIA LÂM',beforeVat:17900000,vat:null,total:17900000,time:'01–03 ngày',warranty:'03 tháng',payment:'Thanh toán 100% trong vòng 07 ngày kể từ ngày xác nhận nghiệm thu và hóa đơn GTGT.',validity:'30 ngày',location:'Tại kho khách hàng',items:[['Bạc trượt càng Double Deep (Hàng gia công) mới 100%',4,600000,2400000],['Sin phốt nắp ty double',4,1500000,6000000],['Sin phốt piston ty double',4,2000000,8000000],['Chi phí nhân công sửa chữa',1,1500000,1500000]],notes:['Bảo hành 03 tháng kể từ ngày xác nhận bàn giao nghiệm thu đối với linh kiện thay thế.','Có thể báo giá thay thế/sửa chữa bổ sung nếu phát sinh không phải lỗi kỹ thuật do HGL gây ra.','Thời gian thực hiện 01–03 ngày kể từ ngày xác nhận báo giá sửa chữa.']},
+  {name:'CÔNG TY CP XE NÂNG KHANG NAM',beforeVat:23000000,vat:1840000,total:24840000,time:'10–15 ngày chuẩn bị hàng',warranty:'01 tháng',payment:'Thanh toán 100% sau khi nhận bàn giao.',validity:'30 ngày',location:'Không nêu',items:[['Ống dầu xe Linde',1,5000000,5000000],['Phớt ty càng xe Linde',4,2250000,9000000],['Bạc đạn trượt',4,2000000,8000000],['Công sửa chữa, lắp đặt',1,1000000,1000000]],notes:['Thời gian chuẩn bị hàng: 10–15 ngày.','Bảo hành 01 tháng.','Báo giá có hiệu lực trong vòng 30 ngày.']},
+  {name:'CÔNG TY TNHH TM DV FORKLIFT THIÊN PHÚC',beforeVat:9550000,vat:764000,total:10314000,time:'03–05 ngày',warranty:'03 tháng',payment:'Thanh toán trong vòng 3–5 ngày kể từ ngày nghiệm thu bàn giao và Hóa đơn GTGT.',validity:'10 ngày',location:'Không nêu',items:[['Ống dầu càng double',1,1150000,1150000],['Phốt ty càng double',4,1050000,4200000],['Bạc trượt càng',4,850000,3400000],['Công lắp đặt',1,800000,800000]],notes:['Giá đã bao gồm VAT.','Bảo hành 3 tháng kể từ ngày nghiệm thu; chỉ bảo hành sản phẩm do Thiên Phúc lắp đặt và sửa chữa, còn nguyên tem bảo hành.','Có thể báo giá thay thế/sửa chữa bổ sung nếu phát sinh không phải lỗi kỹ thuật do Thiên Phúc gây ra.','Báo giá có hiệu lực 10 ngày kể từ ngày báo giá.']}
+ ]}
+];
+
+function load(){
+ let x=localStorage.getItem(KEY); if(x){try{return JSON.parse(x)}catch(e){}}
+ const legacyKeys=[LEGACY_KEY,'AI_QUOTE_CHECKER_V43_CASES','AI_QUOTE_CHECKER_V42_CASES','AI_QUOTE_CHECKER_V41_CASES','AI_QUOTE_CHECKER_V40_CASES','AI_QUOTE_CHECKER_V25_CASES'];
+ for(const k of legacyKeys){const raw=localStorage.getItem(k);if(raw){try{const arr=JSON.parse(raw);localStorage.setItem(KEY,JSON.stringify(arr));return arr}catch(e){}}}
+ localStorage.setItem(KEY,JSON.stringify(demo)); return demo
+}
+let cases=load();
+
+function save(){localStorage.setItem(KEY,JSON.stringify(cases))}
+
+// Lưu file thật bằng IndexedDB: file không bị mất khi đóng trình duyệt/reload trang.
+const FILE_DB='AI_QUOTE_CHECKER_FILES_V1', FILE_STORE='files';
+function dbOpen(){return new Promise((resolve,reject)=>{const r=indexedDB.open(FILE_DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(FILE_STORE)){const st=r.result.createObjectStore(FILE_STORE,{keyPath:'id'});st.createIndex('caseId','caseId',{unique:false});}};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+async function fileSave(caseId,file,source='upload'){
+ const db=await dbOpen();
+ return new Promise((resolve,reject)=>{const tx=db.transaction(FILE_STORE,'readwrite'),st=tx.objectStore(FILE_STORE);const rec={id:caseId+'__'+Date.now()+'__'+Math.random().toString(36).slice(2),caseId,name:file.name,size:file.size,type:file.type||'application/octet-stream',lastModified:file.lastModified||Date.now(),createdAt:new Date().toISOString(),source,blob:file};st.put(rec);tx.oncomplete=()=>{db.close();resolve(rec)};tx.onerror=()=>{db.close();reject(tx.error)}})
+}
+async function filesForCase(caseId){const db=await dbOpen();return new Promise((resolve,reject)=>{const tx=db.transaction(FILE_STORE,'readonly'),st=tx.objectStore(FILE_STORE).index('caseId'),r=st.getAll(caseId);r.onsuccess=()=>{db.close();resolve((r.result||[]).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)))};r.onerror=()=>{db.close();reject(r.error)}})}
+async function fileGet(id){const db=await dbOpen();return new Promise((resolve,reject)=>{const r=db.transaction(FILE_STORE,'readonly').objectStore(FILE_STORE).get(id);r.onsuccess=()=>{db.close();resolve(r.result)};r.onerror=()=>{db.close();reject(r.error)}})}
+async function fileDelete(id){const db=await dbOpen();return new Promise((resolve,reject)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).delete(id);tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
+async function openSavedFile(id,download=false){try{const rec=await fileGet(id);if(!rec)return;const url=URL.createObjectURL(rec.blob);const a=document.createElement('a');a.href=url;a.target=download?'_self':'_blank';if(download)a.download=rec.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}catch(e){alert('Không thể mở file: '+e.message)}}
+async function deleteSavedFile(id,caseId){if(!confirm('Xóa file này khỏi hồ sơ?'))return;try{await fileDelete(id);renderDocs(caseId)}catch(e){alert('Không thể xóa file: '+e.message)}}
+function fmtBytes(n){if(n<1024)return n+' B';if(n<1024*1024)return (n/1024).toFixed(0)+' KB';return (n/1024/1024).toFixed(2)+' MB'}
+function fmtDateTime(x){return new Date(x).toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'})}
+function fmt(n){return new Intl.NumberFormat('vi-VN').format(n)+' ₫'}
+function monthName(d){return 'THÁNG '+String(new Date(d+'T00:00:00').getMonth()+1).padStart(2,'0')+'/'+new Date(d+'T00:00:00').getFullYear()}
+function icon(type){return {'Sửa chữa':'🔧','Mua sắm':'🛒','Dịch vụ':'🧩','Nhà thầu':'🏗️','Bảo trì':'🛠️','Thuê ngoài':'🤝','Khác':'📁'}[type]||'📁'}
+function statusClass(s){return s==='Đã phân tích'||s==='Đã đề xuất'?'done':s==='Đang phân tích'?'doing':'draft'}
+
+function initFilters(){
+ const years=[...new Set(cases.map(c=>new Date(c.date+'T00:00:00').getFullYear()))].sort((a,b)=>b-a);
+ yearFilter.innerHTML='<option value="all">Tất cả năm</option>'+years.map(y=>`<option>${y}</option>`).join('');
+ monthFilter.innerHTML='<option value="all">Tất cả tháng</option>'+Array.from({length:12},(_,i)=>`<option value="${i+1}">Tháng ${String(i+1).padStart(2,'0')}</option>`).join('');
+}
+function renderStats(){
+ sTotal.textContent=cases.length;
+ sDoing.textContent=cases.filter(c=>c.status==='Đang phân tích').length;
+ sDone.textContent=cases.filter(c=>c.status==='Đã phân tích'||c.status==='Đã đề xuất').length;
+ sSuppliers.textContent=cases.reduce((a,c)=>a+(+c.suppliers||0),0);
+}
+function renderCases(){
+ const q=(search.value||'').toLowerCase().trim(), yf=yearFilter.value,mf=monthFilter.value,tf=typeFilter.value,sf=statusFilter.value;
+ let arr=cases.filter(c=>{
+   const d=new Date(c.date+'T00:00:00');
+   return (!q || [c.title,c.id,c.type,c.note,...(c.supplierNames||[])].join(' ').toLowerCase().includes(q))
+    &&(yf==='all'||d.getFullYear()==yf)&&(mf==='all'||d.getMonth()+1==mf)&&(tf==='all'||c.type===tf)&&(sf==='all'||c.status===sf)
+ });
+ arr.sort((a,b)=>b.date.localeCompare(a.date));
+ const groups={};arr.forEach(c=>{let k=monthName(c.date);(groups[k]??=[]).push(c)});
+ if(!arr.length){caseLibrary.innerHTML='<div class="empty">Không tìm thấy hồ sơ phù hợp.<br><br><button class="btn primary" onclick="openNewCase()">＋ Tạo hồ sơ mới</button></div>';return}
+ caseLibrary.innerHTML=Object.entries(groups).map(([m,list])=>`
+   <div class="section-title"><h2>📅 ${m}</h2><span class="count">${list.length} hồ sơ</span></div>
+   <div class="case-grid">${list.map(c=>`
+    <div class="case" onclick="openCase('${c.id}')">
+      <div class="case-head"><div class="case-icon">${icon(c.type)}</div><span class="status ${statusClass(c.status)}">${c.status}</span></div>
+      <h3>${esc(c.title)}</h3><div class="id">${c.id}</div>
+      <div class="meta"><span class="pill">${esc(c.type)}</span><span class="pill">${c.suppliers||0} NCC / nhà thầu</span></div>
+      <div class="case-foot"><span>${fmtDate(c.date)}</span><div style="display:flex;gap:8px;align-items:center"><b style="color:var(--navy)">Xem hồ sơ →</b><button class="btn light sm" title="Xóa hồ sơ" onclick="event.stopPropagation();deleteCase('${c.id}')">🗑 Xóa</button></div></div>
+    </div>`).join('')}</div>`).join('');
+}
+async function deleteCase(id){
+ const c=cases.find(x=>x.id===id);
+ if(!c)return;
+ const ok=confirm(`Xóa hồ sơ "${c.title}"?\n\nToàn bộ báo giá, tài liệu và hợp đồng đã lưu trong hồ sơ này sẽ bị xóa khỏi phần mềm.\n\nBạn có chắc muốn xóa không?`);
+ if(!ok)return;
+ try{
+   const files=await filesForCase(id);
+   for(const f of files){ try{ await fileDelete(f.id); }catch(e){ console.warn('Không xóa được file',f.id,e); } }
+ }catch(e){ console.warn('Không thể đọc file của hồ sơ',e); }
+ cases=cases.filter(x=>x.id!==id);
+ save();
+ showLibrary();
+}
+function fmtDate(d){return new Date(d+'T00:00:00').toLocaleDateString('vi-VN')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+function showLibrary(){libraryView.classList.remove('hidden');detailView.classList.add('hidden');renderStats();initFilters();renderCases();document.querySelectorAll('.nav button')[0].classList.add('active');document.querySelectorAll('.nav button')[1].classList.remove('active')}
+function openCase(id){
+ const c=cases.find(x=>x.id===id);if(!c)return;
+ libraryView.classList.add('hidden');detailView.classList.remove('hidden');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+ detailView.innerHTML=`
+  <button class="back" onclick="showLibrary()">← Quay lại kho hồ sơ</button>
+  <div class="panel">
+   <div class="case-title"><div><div class="id">${c.id} • ${fmtDate(c.date)}</div><h1>${icon(c.type)} ${esc(c.title)}</h1><div class="sub">${esc(c.note||'Chưa có mô tả phạm vi.')}</div></div><div style="display:flex;gap:10px;align-items:center"><span class="status ${statusClass(c.status)}">${c.status}</span><button class="btn light sm" onclick="deleteCase('${c.id}')">🗑 Xóa hồ sơ</button></div></div>
+   <div class="info-grid">
+    <div class="info"><label>LOẠI ĐÁNH GIÁ</label><b>${esc(c.type)}</b></div>
+    <div class="info"><label>SỐ NCC / NHÀ THẦU</label><b>${c.suppliers}</b></div>
+    <div class="info"><label>THỜI GIAN HỒ SƠ</label><b>${monthName(c.date)}</b></div>
+    <div class="info"><label>HỒ SƠ BÁO GIÁ</label><b>${c.quotes?.length?'Đã có dữ liệu':'Chưa nhập dữ liệu'}</b></div>
+   </div>
+  </div>
+  <div class="tabs">
+   <button class="tab active" onclick="tab(this,'overview')">① Tổng quan</button>
+   <button class="tab" onclick="tab(this,'docs')">② Hồ sơ & báo giá</button>
+   <button class="tab" onclick="tab(this,'ai')">③ AI đọc dữ liệu</button>
+   <button class="tab" onclick="tab(this,'compare')">④ So sánh & đánh giá</button>
+   <button class="tab" onclick="tab(this,'select')">⑤ Chọn NCC / Nhà thầu</button>
+   ${isContractCase(c)?`<button class="tab contract-tab" onclick="tab(this,'contract')">⑥ 📄 Hợp đồng</button>`:''}
+  </div>
+  <div id="tabArea" class="tabcontent"></div>`;
+ renderTab('overview',c);
+}
+function tab(btn,name){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');let c=cases.find(x=>detailView.innerHTML.includes(x.id));renderTab(name,c)}
+function renderTab(name,c){
+ const a=document.getElementById('tabArea');if(!a)return;
+ if(name==='overview')a.innerHTML=`
+   <div class="metric-grid"><div class="metric"><small>Hồ sơ</small><b>${c.quotes?.length||0}/${c.suppliers}</b></div><div class="metric"><small>Trạng thái</small><b>${c.status}</b></div><div class="metric"><small>Loại</small><b>${c.type}</b></div>${isContractCase(c)?`<div class="metric"><small>Hợp đồng</small><b>${c.contract?.signed?'Đã ký':'Chưa ký'}</b></div>`:''}<div class="metric"><small>Mã case</small><b>${c.id}</b></div></div>
+   <div class="ai-box" style="margin-top:16px"><b>AI Case Assistant</b><br>Đây là không gian phân tích riêng cho hạng mục này. AI sẽ đọc các tài liệu được tải lên, chuẩn hóa dữ liệu giữa các NCC/nhà thầu và đưa ra các điểm cần kiểm tra dựa trên bằng chứng trong hồ sơ.</div>${isContractType(c)?(c.selectedSupplier?'<div class="alert ok" style="margin-top:14px"><b>✓ Đã chọn NCC / Nhà thầu:</b> '+esc(c.selectedSupplier)+'<br>Bước tiếp theo: vào <b>⑦ Hợp đồng</b> để upload và lưu hợp đồng.</div>':'<div class="alert warn" style="margin-top:14px"><b>Chưa chọn NCC / Nhà thầu.</b><br>Hãy vào <b>④ Đánh giá & so sánh</b> và bấm <b>Chọn NCC / Nhà thầu</b>. Sau khi chọn, bước <b>⑦ Ký hợp đồng</b> sẽ tự xuất hiện.</div>'):''}`;
+ if(name==='docs'){renderDocs(c);return;}
+ if(name==='ai')a.innerHTML=`
+   <div class="alert info"><b>AI đọc hồ sơ</b> — hệ thống đọc trực tiếp nội dung file trên máy, giữ lại dữ liệu nguồn và chỉ ghi “Không thấy nêu rõ” khi thực sự không tìm thấy bằng chứng trong file.</div>
+   ${c.quotes?.length?c.quotes.map((q,qi)=>`<div class="panel" style="margin-bottom:14px;box-shadow:none">
+     <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h3 style="margin:0 0 4px">${esc(q.name||q.fileName)}</h3><div class="sub">${esc(q.fileName||'')} • ${q.quoteDate?'Ngày báo giá: '+esc(q.quoteDate):'Không thấy ngày báo giá'}</div></div><span class="pill">${q.items?.length||0} dòng hạng mục</span><button class="btn light sm" onclick="rereadQuote('${c.id}',${qi})">🔄 Đọc lại file</button></div>
+     ${q.error?`<div class="alert warn" style="margin-top:10px"><b>⚠ Lỗi ở bước đọc file:</b> ${esc(q.error)}<br><span>Chưa thực hiện so sánh vì dữ liệu nguồn chưa được đọc.</span></div>`:''}
+     <table class="table" style="margin-top:12px"><tbody>
+       <tr><td><b>Tổng trước VAT</b></td><td>${q.beforeVat!=null?fmt(q.beforeVat):'Không thấy nêu rõ'}</td><td><b>VAT</b></td><td>${q.vat!=null?fmt(q.vat):'Không thấy nêu rõ'}${q.vatRate?` (${q.vatRate}%)`:''}</td></tr>
+       <tr><td><b>Tổng sau VAT</b></td><td>${q.total!=null?fmt(q.total):'Không thấy nêu rõ'}</td><td><b>Thời gian</b></td><td>${esc(q.time||'Không thấy nêu rõ')}</td></tr>
+       <tr><td><b>Bảo hành</b></td><td>${esc(q.warranty||'Không thấy nêu rõ')}</td><td><b>Thanh toán</b></td><td>${esc(q.payment||'Không thấy nêu rõ')}</td></tr>
+       <tr><td><b>Hiệu lực</b></td><td>${esc(q.validity||'Không thấy nêu rõ')}</td><td><b>Địa điểm</b></td><td>${esc(q.location||'Không thấy nêu rõ')}</td></tr>
+     </tbody></table>
+     <h4 style="margin:16px 0 8px">📦 Hạng mục đã đọc</h4>
+     ${q.items?.length?`<table class="table"><thead><tr><th>Hạng mục</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead><tbody>${q.items.map(i=>`<tr><td>${esc(i[0])}</td><td>${i[1]}</td><td>${fmt(i[2])}</td><td>${fmt(i[3])}</td></tr>`).join('')}</tbody></table>`:'<div class="alert warn">Không nhận diện được dòng hạng mục có đủ số liệu.</div>'}
+     <h4 style="margin:16px 0 8px">🎯 Mức độ đầy đủ dữ liệu</h4><div class="sub"><b>${q.quality?.score??0}%</b> • ${q.quality?.readyForComparison?'✓ Đủ điều kiện đưa sang so sánh':'⚠ Chưa đủ điều kiện tự động so sánh'}${q.quality?.blockers?.length?'<br>⚠ '+q.quality.blockers.map(esc).join(' • '):''}</div><h4 style="margin:16px 0 8px">🔎 Kiểm tra chéo</h4><div class="sub">Tổng hạng mục: <b>${q.arithmetic?.itemsTotal?fmt(q.arithmetic.itemsTotal):'—'}</b> • Hạng mục ↔ trước VAT: <b>${q.arithmetic?.itemsMatchTotal===true?'Khớp':q.arithmetic?.itemsMatchTotal===false?'Không khớp':'Chưa đủ dữ liệu'}</b> • VAT: <b>${q.arithmetic?.vatMatches===true?'Khớp':q.arithmetic?.vatMatches===false?'Không khớp':'Chưa đủ dữ liệu'}</b> • Trước + VAT = Sau: <b>${q.arithmetic?.totalMatches===true?'Khớp':q.arithmetic?.totalMatches===false?'Không khớp':'Chưa đủ dữ liệu'}</b></div><h4 style="margin:16px 0 8px">🔎 Bằng chứng & ghi chú</h4><ul style="margin:0 0 0 18px">${(q.notes||[]).map(n=>`<li>${esc(n)}</li>`).join('')}</ul>
+     <details style="margin-top:14px"><summary><b>Xem nội dung file đã đọc</b></summary><pre style="white-space:pre-wrap;background:#f7f9fc;padding:12px;border-radius:10px;font-size:11px;max-height:360px;overflow:auto">${esc(q.rawText||'')}</pre></details>
+   </div>`).join(''):'<div class="empty">Chưa có dữ liệu extraction. Vào “Hồ sơ & báo giá” để upload.</div>'}`;
+ if(name==='compare')a.innerHTML=renderCompare(c);
+ if(name==='select')a.innerHTML=renderSelect(c);
+ if(name==='contract')return renderContract(c);
+}
+function isContractType(c){ return !!(c && ((+c.suppliers||0)>0 || c.quotes?.length)); }
+function isContractCase(c){ return isContractType(c) && !!c?.selectedSupplier; }
+function selectSupplier(id,index){
+ const c=cases.find(x=>x.id===id); if(!c || !c.quotes?.[index]) return;
+ c.selectedSupplier=c.quotes[index].name;
+ c.selectedSupplierIndex=index;
+ c.contract=c.contract||{};
+ c.contract.enabled=true;
+ c.contract.supplier=c.selectedSupplier;
+ c.contract.signed=false;
+ c.status='Đã chọn NCC / Nhà thầu';
+ save();
+ renderCases();
+ openCase(id);
+ setTimeout(()=>{ const tabs=document.querySelectorAll('.tab'); const selectTab=[...tabs].find(b=>b.textContent.includes('Chọn NCC / Nhà thầu')); if(selectTab){ selectTab.click(); } },50);
+}
+async function renderContract(c){
+ const a=document.getElementById('tabArea');if(!a)return;
+ const ct=c.contract||{};
+ a.innerHTML=`<div class="panel contract-panel" style="padding:18px;border:1px solid #dbe3ef;box-shadow:none">
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap">
+    <div><h3 style="margin:0 0 5px">⑦ Hợp đồng</h3><div class="sub">Bước tiếp theo sau khi hoàn tất đánh giá NCC / Nhà thầu. Thông tin và file hợp đồng được lưu riêng trong hồ sơ <b>${esc(c.id)}</b>.</div></div>
+    <span class="badge ${ct.signed?'ok':'warn'}">${ct.signed?'✓ Đã ký hợp đồng':'⏳ Chưa ký hợp đồng'}</span>
+   </div>
+   <div class="form-grid" style="margin-top:18px">
+    <div class="field"><label>Số hợp đồng</label><input id="ctNo" value="${esc(ct.number||'')}" placeholder="VD: 85/2026/HĐ-DPC"></div>
+    <div class="field"><label>Ngày ký</label><input id="ctDate" type="date" value="${esc(ct.signDate||'')}"></div>
+    <div class="field"><label>NCC / Nhà thầu ký hợp đồng</label><input id="ctSupplier" value="${esc(ct.supplier||c.selectedSupplier||'')}" placeholder="Tên NCC / Nhà thầu" readonly></div>
+    <div class="field"><label>Ngày hiệu lực</label><input id="ctEffective" type="date" value="${esc(ct.effectiveDate||'')}"></div>
+    <div class="field"><label>Ngày hết hạn</label><input id="ctExpiry" type="date" value="${esc(ct.expiryDate||'')}"></div>
+    <div class="field"><label>Trạng thái</label><select id="ctStatus"><option ${!ct.signed?'selected':''}>Chưa ký</option><option ${ct.signed?'selected':''}>Đã ký</option></select></div>
+    <div class="field full"><label>Ghi chú hợp đồng</label><textarea id="ctNote" placeholder="Điều khoản cần lưu ý, gia hạn, thanh toán, SLA...">${esc(ct.note||'')}</textarea></div>
+   </div>
+   <div style="margin-top:15px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn orange" onclick="saveContract('${c.id}')">💾 Lưu hợp đồng</button><label class="btn light" style="cursor:pointer">📎 Thêm file hợp đồng<input id="contractFiles" type="file" multiple accept=".pdf,.doc,.docx,.xlsx,.xls,.jpg,.jpeg,.png" style="display:none" onchange="saveContractFiles('${c.id}')"></label></div>
+   <div id="contractMsg" style="margin-top:12px"></div>
+ </div>
+ <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:10px"><h3 style="margin:0">📁 Hợp đồng & tài liệu đã lưu</h3><span id="contractFileCount" class="count">Đang tải...</span></div>
+ <div id="contractFilesList" class="file-list"></div>
+ <div class="alert info" style="margin-top:15px"><b>Quản lý hồ sơ:</b> hợp đồng được lưu cùng mã hồ sơ đánh giá, giúp tra cứu lại báo giá, kết quả đánh giá và chứng từ hợp đồng trong cùng một nơi.</div>`;
+ await renderContractFiles(c.id);
+}
+async function saveContract(id){
+ const c=cases.find(x=>x.id===id);if(!c)return;
+ if(!c.selectedSupplier){alert('Vui lòng chọn NCC / Nhà thầu ở bước ④ trước khi lưu hợp đồng.');return;}
+ c.contract={number:document.getElementById('ctNo')?.value.trim()||'',signDate:document.getElementById('ctDate')?.value||'',supplier:c.selectedSupplier,effectiveDate:document.getElementById('ctEffective')?.value||'',expiryDate:document.getElementById('ctExpiry')?.value||'',signed:document.getElementById('ctStatus')?.value==='Đã ký',note:document.getElementById('ctNote')?.value.trim()||'',enabled:true,updatedAt:new Date().toISOString()};
+ if(c.contract.signed)c.status='Đã ký hợp đồng';
+ save();
+ const msg=document.getElementById('contractMsg');if(msg)msg.innerHTML='<div class="alert ok">✓ Đã lưu thông tin hợp đồng vào hồ sơ.</div>';
+ renderCases();
+}
+async function saveContractFiles(id){
+ const input=document.getElementById('contractFiles'),msg=document.getElementById('contractMsg');if(!input||!input.files.length)return;
+ let n=0;for(const f of [...input.files]){try{await fileSave(id,f,'contract');n++;}catch(e){console.error(e)}}
+ if(msg)msg.innerHTML=`<div class="alert ok">✓ Đã lưu ${n}/${input.files.length} file hợp đồng vào hồ sơ.</div>`;
+ input.value='';await renderContractFiles(id);
+}
+async function renderContractFiles(id){
+ const box=document.getElementById('contractFilesList'),count=document.getElementById('contractFileCount');if(!box||!count)return;
+ try{const files=(await filesForCase(id)).filter(f=>f.source==='contract');count.textContent=files.length+' file';box.innerHTML=files.length?files.map(f=>`<div class="file-row"><div class="file-main"><div class="file-name">📄 ${esc(f.name)}</div><div class="file-meta">${fmtBytes(f.size)} • ${esc(f.type||'file')} • Lưu ${fmtDateTime(f.createdAt)}</div></div><div class="file-actions"><button class="btn light sm" onclick="openSavedFile('${f.id}')">Mở</button><button class="btn light sm" onclick="openSavedFile('${f.id}',true)">Tải</button><button class="btn light sm" onclick="deleteSavedFile('${f.id}','${id}');setTimeout(()=>renderContractFiles('${id}'),300)">Xóa</button></div></div>`).join(''):'<div class="empty" style="padding:25px">Chưa có file hợp đồng nào được lưu.</div>';}catch(e){box.innerHTML='<div class="alert warn">Không thể đọc file hợp đồng: '+esc(e.message)+'</div>'}
+}
+async function renderDocs(c){
+ const a=document.getElementById('tabArea');if(!a)return;
+ a.innerHTML=`<div class="panel" style="padding:18px;border:1px solid #dbe3ef;box-shadow:none">
+   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+     <div style="font-size:18px;font-weight:800">📎 Bước 1 — Upload báo giá / tài liệu</div>
+     <span class="pill">Không giới hạn số file</span>
+   </div>
+   <div class="sub" style="margin-top:6px">
+     Chọn tất cả báo giá của các NCC / nhà thầu trong cùng một lần. 
+     Hệ thống <b>không chỉ lưu file</b>: file bạn chọn được đọc ngay bằng bộ đọc chung; dữ liệu so sánh luôn lấy từ file thực tế của hồ sơ, không lấy dữ liệu mẫu của case khác.
+   </div>
+   <input id="quoteFiles" type="file" multiple accept=".xlsx,.xls,.csv,.pdf,.docx,.jpg,.jpeg,.png,.webp" style="margin-top:14px" onchange="showSelectedQuotes()">
+   <div id="selectedQuotes" class="sub" style="margin-top:10px"></div>
+   <button class="btn orange" style="margin-top:12px" onclick="analyzeUploadedQuotes('${c.id}')">🤖 Bước 2 — Đọc & phân tích báo giá</button> <button class="btn light" style="margin-top:12px" onclick="reanalyzeSavedQuotes('${c.id}')">🔄 Đọc lại toàn bộ file đã lưu</button>
+   <div id="uploadProgress" style="margin-top:10px"></div>
+ </div>
+ <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:10px"><h3 style="margin:0">📁 File đã lưu trong hồ sơ</h3><span id="savedFileCount" class="count">Đang tải...</span></div>
+ <div id="savedFiles" class="file-list"></div>
+ <h3>📊 Dữ liệu đã phân tích</h3><div class="alert info">Hệ thống đọc PDF theo từng dòng/bảng, Excel theo từng dòng, DOCX theo từng bảng và OCR cho file scan. Nếu một trường không có trong báo giá, hệ thống sẽ ghi “Không thấy nêu rõ” thay vì báo lỗi chung.</div>${c.quotes?.length?`<table class="table"><thead><tr><th>NCC / Nhà thầu</th><th>Trước VAT</th><th>VAT</th><th>Tổng sau VAT</th><th>Thời gian</th><th>Bảo hành</th></tr></thead><tbody>${c.quotes.map(q=>`<tr><td>${esc(q.name)}</td><td>${q.beforeVat!=null?fmt(q.beforeVat):'Chưa nêu'}</td><td>${q.vat!=null?fmt(q.vat):'Chưa nêu'}</td><td>${q.total!=null?fmt(q.total):'Chưa nêu'}</td><td>${esc(q.time||'Chưa nêu')}</td><td>${esc(q.warranty||'Chưa nêu')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Chưa có dữ liệu báo giá được phân tích. File vẫn có thể được lưu để tra cứu.</div>'}`;
+ try{
+   const files=await filesForCase(c.id);
+   const box=document.getElementById('savedFiles'),count=document.getElementById('savedFileCount');
+   count.textContent=files.length+' file';
+   box.innerHTML=files.length?files.map(f=>`<div class="file-row"><div class="file-main"><div class="file-name">📄 ${esc(f.name)}</div><div class="file-meta">${fmtBytes(f.size)} • ${esc(f.type||'file')} • Lưu ${fmtDateTime(f.createdAt)}</div></div><div class="file-actions"><button class="btn light sm" onclick="openSavedFile('${f.id}')">Mở</button><button class="btn light sm" onclick="openSavedFile('${f.id}',true)">Tải</button><button class="btn light sm" onclick="deleteSavedFile('${f.id}','${c.id}')">Xóa</button></div></div>`).join(''):'<div class="empty" style="padding:25px">Chưa có file nào được lưu trong hồ sơ.</div>';
+ }catch(e){document.getElementById('savedFiles').innerHTML='<div class="alert warn">Không thể đọc kho file của trình duyệt: '+esc(e.message)+'</div>'}
+}
+async function rereadQuote(caseId,index){
+ const c=cases.find(x=>x.id===caseId); if(!c) return;
+ const q=c.quotes?.[index]; if(!q?.fileId){alert('Không tìm thấy file gốc đã lưu cho báo giá này.');return;}
+ try{
+  const rec=await fileGet(q.fileId); if(!rec?.blob){alert('Không mở được file gốc.');return;}
+  const text=await extractFileText(rec.blob);
+  const fresh=parseQuote(text,rec.name,c); fresh.fileId=q.fileId; fresh.fileName=rec.name;
+  c.quotes[index]=fresh; c.suppliers=c.quotes.filter(x=>!isCustomerName(x.name)).length; c.supplierNames=c.quotes.filter(x=>!isCustomerName(x.name)).map(x=>x.name); c.updatedAt=new Date().toISOString(); save(); openCase(caseId);
+  const btn=[...document.querySelectorAll('.tab')].find(x=>x.textContent.includes('③ AI đọc dữ liệu')); if(btn) tab(btn,'ai');
+ }catch(e){alert('Đọc lại thất bại: '+e.message)}
+}
+
+function renderFinancialAudit(q){
+  const a=q?.arithmetic||{}, e=a.v53Evidence||{};
+  const rows=[];
+  if(e.before?.line) rows.push('Trước VAT ← '+e.before.line);
+  if(e.vat?.line) rows.push('VAT ← '+e.vat.line);
+  if(e.after?.line) rows.push('Sau VAT ← '+e.after.line);
+  if(e.amountWords) rows.push('Bằng chữ → '+fmt(e.amountWords));
+  if(a.itemsTotal) rows.push('Tổng hạng mục → '+fmt(a.itemsTotal));
+  return rows.length?'<div class="alert info" style="margin-top:10px"><b>🔎 Nguồn số liệu:</b><br>'+rows.map(esc).join('<br>')+'</div>':'';
+}
+
+function renderCompare(c){
+ if(!c.quotes?.length)return '<div class="empty">Chưa có dữ liệu báo giá để so sánh. Hãy upload báo giá trước.</div>';
+ const customerQuotes=c.quotes.filter(q=>isCustomerName(q.name));
+ const vals=c.quotes.filter(q=>!isCustomerName(q.name)).map(q=>Number(q.total)).filter(v=>Number.isFinite(v)&&v>0); const min=vals.length?Math.min(...vals):0,max=vals.length?Math.max(...vals):0;
+ const allKnown=c.quotes.filter(q=>!isCustomerName(q.name)&&q.total!=null&&q.total>0).length;
+ const supplierQuotes=c.quotes.filter(q=>!isCustomerName(q.name));
+ const blocked=supplierQuotes.filter(q=>q.quality&&!q.quality.financialReady);
+ const comparableQuotes=supplierQuotes.filter(q=>!q.quality || q.quality.financialReady);
+ const warnings=[];
+ c.quotes.filter(q=>q.error).forEach(q=>warnings.push(q.name+': '+q.error));
+ if(c.quotes.some(q=>!isCustomerName(q.name)&&(q.beforeVat==null||q.vat==null||q.total==null)))warnings.push('Có báo giá NCC chưa xác định đủ Trước VAT + VAT + Sau VAT; phần thiếu không được tự điền.');
+ const itemCounts=c.quotes.map(q=>(q.items||[]).length);
+ if(itemCounts.some(x=>x===0))warnings.push('Có báo giá chưa nhận diện được bảng hạng mục; cần mở “Nội dung file đã đọc” để kiểm tra.');
+ const sameScope=c.quotes.length>1 && c.quotes.every(q=>(q.items||[]).length>0);
+ return `<div class="section-head"><div><h3 style="margin:0">📊 So sánh & đánh giá NCC / Nhà thầu</h3><div class="sub">${c.scope?'<b>Phạm vi chuẩn:</b> '+esc(c.scope)+'<br>':''}<b>Nguyên tắc:</b> tên NCC lấy từ tiêu đề/đầu file hoặc tên file; GONSA được coi là khách hàng và không được coi là NCC. So sánh trực tiếp dữ liệu đã đọc từ từng báo giá. Hệ thống không tự coi các hạng mục khác mô tả là cùng một hạng mục.</div></div></div>
+ <div class="metric-grid"><div class="metric"><small>Giá thấp nhất đã đọc</small><b>${min?fmt(min):'—'}</b></div><div class="metric"><small>Giá cao nhất đã đọc</small><b>${max?fmt(max):'—'}</b></div><div class="metric"><small>Chênh lệch</small><b>${min&&max?fmt(max-min):'—'}</b></div><div class="metric"><small>Báo giá NCC</small><b>${supplierQuotes.length}</b></div></div>
+ ${customerQuotes.length?'<div class="alert warn" style="margin-top:14px"><b>⚠ Phát hiện tên khách hàng/GONSA trong danh sách báo giá.</b> Hệ thống đã loại khỏi phép tính giá và đánh dấu để bạn kiểm tra lại nguồn file.</div>':''}
+ ${blocked.length?'<div class="alert warn" style="margin-top:14px"><b>⛔ Chưa đủ dữ liệu để so sánh tự động:</b><ul>'+blocked.map(q=>'<li><b>'+esc(q.name)+'</b>: '+(q.quality?.blockers||[]).map(esc).join(' ')+'</li>').join('')+'</ul>Hệ thống không tự điền số còn thiếu.</div>':''}${warnings.length?'<div class="alert warn" style="margin-top:14px"><b>⚠ Kiểm tra dữ liệu:</b><ul>'+warnings.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>':'<div class="alert ok" style="margin-top:14px"><b>✓ Đã có dữ liệu tổng tiền và hạng mục để đối chiếu.</b> Vẫn cần kiểm tra phạm vi kỹ thuật trước khi lựa chọn.</div>'}
+ <h3 style="margin-top:20px">1. So sánh tổng tiền</h3>
+ <table class="table"><thead><tr><th>NCC / Nhà thầu</th><th>Trước VAT</th><th>VAT</th><th>Sau VAT</th><th>Thời gian</th><th>Bảo hành</th><th>Hiệu lực</th><th>Kiểm tra số liệu</th></tr></thead><tbody>${c.quotes.map(q=>`<tr class="${c.selectedSupplier===q.name?'selected-row':''}"><td><b>${esc(q.name)}</b></td><td>${q.beforeVat!=null?fmt(q.beforeVat):'—'}</td><td>${q.vat!=null?fmt(q.vat):'—'}${q.vatRate!=null?' ('+q.vatRate+'%)':''}</td><td>${q.total!=null?fmt(q.total):'—'}</td><td>${esc(q.time||'—')}</td><td>${esc(q.warranty||'—')}</td><td>${esc(q.validity||'—')}</td><td>${q.error?'<span style="color:#b91c1c">✕ Lỗi đọc</span>':(q.arithmetic?.totalMatches===false||q.arithmetic?.itemsMatchTotal===false||q.arithmetic?.vatMatches===false)?'<span style="color:#b45309">⚠ Cần kiểm tra</span>':(q.quality?.financialReady&&q.arithmetic?.totalMatches===true)?'<span style="color:#087443">✓ Đã đối chiếu</span>':'<span style="color:#a16207">⚠ Chưa đủ dữ liệu</span>'}</td></tr>`).join('')}</tbody></table>
+ <h3 style="margin-top:20px">2. So sánh từng hạng mục</h3>
+ ${buildItemComparison(c)}
+ <h3 style="margin-top:20px">2A. Đối chiếu số liệu nguồn</h3>
+ <table class="table"><thead><tr><th>NCC</th><th>Tổng hạng mục</th><th>Trước VAT</th><th>VAT</th><th>Sau VAT</th><th>Kiểm tra</th></tr></thead><tbody>${c.quotes.map(q=>`<tr><td><b>${esc(q.name)}</b></td><td>${q.arithmetic?.itemsTotal?fmt(q.arithmetic.itemsTotal):'—'}</td><td>${q.beforeVat!=null?fmt(q.beforeVat):'—'}</td><td>${q.vat!=null?fmt(q.vat):'—'}</td><td>${q.total!=null?fmt(q.total):'—'}</td><td>${q.arithmetic?.itemsMatchTotal===false||q.arithmetic?.vatMatches===false||q.arithmetic?.totalMatches===false?'⚠ Cần kiểm tra':'✓ Khớp phép tính'}</td></tr>`).join('')}</tbody></table>
+ <h3 style="margin-top:20px">3. Điều kiện thương mại & phạm vi</h3>
+ <table class="table"><thead><tr><th>NCC / Nhà thầu</th><th>Thanh toán</th><th>Địa điểm</th><th>Ghi chú kiểm tra</th></tr></thead><tbody>${c.quotes.map(q=>`<tr><td><b>${esc(q.name)}</b></td><td>${esc(q.payment||'—')}</td><td>${esc(q.location||'—')}</td><td>${(q.notes||[]).map(x=>esc(x)).join('<br>')}</td></tr>`).join('')}</tbody></table>
+ <h3 style="margin-top:20px">4. Kiểm tra chênh lệch</h3>
+ <div class="alert info">Giá thấp hơn chỉ là một thông tin định lượng. Nếu các báo giá có hạng mục, quy cách, số lượng hoặc điều kiện khác nhau thì cần xác minh trước khi so sánh trực tiếp.</div>
+ <h3 style="margin-top:20px">5. Nội dung file đã đọc</h3>
+ ${c.quotes.map(q=>`<details style="margin:8px 0;border:1px solid var(--line);border-radius:10px;padding:10px"><summary><b>${esc(q.name)}</b> — ${esc(q.fileName||'')}</summary><pre style="white-space:pre-wrap;font-size:12px;line-height:1.5;background:#f7f9fc;padding:12px;border-radius:8px;max-height:400px;overflow:auto">${esc(q.rawText||'')}</pre></details>`).join('')} ${c.quotes.map(q=>renderFinancialAudit(q)).join('')}
+ <div class="alert info" style="margin-top:14px"><b>AI không tự chọn NCC.</b> Sau khi kiểm tra các điểm chênh lệch, người phụ trách thực hiện lựa chọn tại bước <b>⑤ Chọn NCC / Nhà thầu</b>.</div>`;
+}
+
+function renderSelect(c){
+ if(!c.quotes?.length)return '<div class="empty">Chưa có báo giá để lựa chọn NCC / Nhà thầu.</div>';
+ const chosen=c.selectedSupplier;
+ return `<div class="section-head"><div><h3 style="margin:0">🎯 Chọn NCC / Nhà thầu</h3><div class="sub">Đây là màn hình riêng để người phụ trách ghi nhận đơn vị được lựa chọn sau khi đã hoàn tất so sánh và đánh giá.</div></div>${chosen?`<span class="badge ok">✓ Đã chọn</span>`:'<span class="badge warn">Chưa chọn</span>'}</div>
+ <div class="panel" style="padding:14px;border:1px solid #dbe3ef;box-shadow:none;background:#fbfcfe">
+  <div style="font-weight:800;margin-bottom:10px">Danh sách NCC / Nhà thầu</div>
+  ${c.quotes.map((q,idx)=>`<div class="select-card ${chosen===q.name?'chosen':''}">
+   <div><b>${esc(q.name)}</b><div class="sub">${fmt(q.total)} • ${esc(q.time||'Chưa đọc được')} • BH: ${esc(q.warranty||'Chưa đọc được')}</div></div>
+   <button class="btn ${chosen===q.name?'light':'orange'} sm" onclick="selectSupplier('${c.id}',${idx})">${chosen===q.name?'✓ NCC / Nhà thầu đã chọn':'Chọn NCC / Nhà thầu'}</button>
+  </div>`).join('')}
+ </div>
+ ${chosen?`<div class="alert ok" style="margin-top:14px"><b>✓ NCC / Nhà thầu đã chọn:</b> ${esc(chosen)}<br>Hệ thống đã lưu lựa chọn vào hồ sơ <b>${esc(c.id)}</b>. <b>Bước tiếp theo: ⑥ Hợp đồng.</b></div>`:`<div class="alert warn" style="margin-top:14px"><b>Chưa chọn NCC / Nhà thầu.</b><br>Hãy chọn một đơn vị ở trên. Hệ thống sẽ lưu lựa chọn và mở bước Hợp đồng.</div>`}`;
+}
+function renderContractInline(c){
+ const ct=c.contract||{};
+ return `<div id="inlineContract" class="panel contract-panel" style="margin-top:18px;padding:20px;border:2px solid #cfe7d6;background:#fbfffc">
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap"><div><h3 style="margin:0 0 5px">📄 2. KÝ HỢP ĐỒNG & LƯU HỢP ĐỒNG</h3><div class="sub">NCC / Nhà thầu đã chọn: <b>${esc(c.selectedSupplier)}</b>. Nhập thông tin và upload hợp đồng ngay tại đây.</div></div><span class="badge ${ct.signed?'ok':'warn'}">${ct.signed?'✓ Đã ký hợp đồng':'⏳ Chưa ký hợp đồng'}</span></div>
+   <div class="form-grid" style="margin-top:16px">
+    <div class="field"><label>Số hợp đồng</label><input id="ctNo" value="${esc(ct.number||'')}" placeholder="VD: 85/2026/HĐ-DPC"></div>
+    <div class="field"><label>Ngày ký</label><input id="ctDate" type="date" value="${esc(ct.signDate||'')}"></div>
+    <div class="field"><label>NCC / Nhà thầu</label><input value="${esc(c.selectedSupplier)}" readonly></div>
+    <div class="field"><label>Ngày hiệu lực</label><input id="ctEffective" type="date" value="${esc(ct.effectiveDate||'')}"></div>
+    <div class="field"><label>Ngày hết hạn</label><input id="ctExpiry" type="date" value="${esc(ct.expiryDate||'')}"></div>
+    <div class="field"><label>Trạng thái hợp đồng</label><select id="ctStatus"><option ${!ct.signed?'selected':''}>Chưa ký</option><option ${ct.signed?'selected':''}>Đã ký</option></select></div>
+    <div class="field full"><label>Ghi chú hợp đồng</label><textarea id="ctNote" placeholder="Điều khoản cần lưu ý, thanh toán, SLA, gia hạn...">${esc(ct.note||'')}</textarea></div>
+   </div>
+   <div style="margin-top:15px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn orange" onclick="saveContract('${c.id}');setTimeout(()=>openCase('${c.id}'),150)">💾 Lưu hợp đồng</button><label class="btn light" style="cursor:pointer">📎 UPLOAD HỢP ĐỒNG<input id="contractFiles" type="file" multiple accept=".pdf,.doc,.docx,.xlsx,.xls,.jpg,.jpeg,.png" style="display:none" onchange="saveContractFiles('${c.id}')"></label></div>
+   <div id="contractMsg" style="margin-top:12px"></div><div style="margin-top:15px"><b>📁 Hợp đồng đã lưu trong hồ sơ</b><div id="contractFilesList" class="file-list" style="margin-top:8px"></div></div>
+ </div>`;
+}
+function normalizeItemName(name){
+ return String(name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+function buildNormalizationTable(c){
+ const qs=c.quotes||[];
+ const rows=[];
+ const seen=[];
+ qs.forEach(q=>(q.items||[]).forEach(i=>{
+   const raw=String(i[0]||'').trim(); if(!raw)return;
+   const norm=normalizeItemName(raw);
+   let group=seen.find(x=>x.key===norm || x.key.split(' ').some(w=>w.length>3 && norm.includes(w)) || norm.split(' ').some(w=>w.length>3 && x.key.includes(w)));
+   if(!group){group={key:norm||raw.toLowerCase(),label:raw,values:{}};seen.push(group);}
+   group.values[q.name]=raw;
+ }));
+ if(!seen.length){
+   return '<div class="empty">Chưa nhận diện được dòng hạng mục chi tiết. Hãy kiểm tra file báo giá hoặc bổ sung bảng yêu cầu/phạm vi để AI có cơ sở đối chiếu.</div>';
+ }
+ let head=qs.map(q=>`<th>${esc(q.name)}</th>`).join('');
+ let body=seen.map(g=>{
+   const vals=qs.map(q=>`<td>${esc(g.values[q.name]||'—')}</td>`).join('');
+   const present=qs.filter(q=>g.values[q.name]).length;
+   const flag=present===qs.length?'✓ Có ở tất cả NCC':'⚠ Có ở '+present+'/'+qs.length+' NCC';
+   return `<tr><td><b>${esc(g.label)}</b></td>${vals}<td>${flag}</td></tr>`;
+ }).join('');
+ return `<table class="table"><thead><tr><th>Nhóm / hạng mục nhận diện</th>${head}<th>AI kiểm tra</th></tr></thead><tbody>${body}</tbody></table>`;
+}
+function showSelectedQuotes(){
+ const input=document.getElementById('quoteFiles'), box=document.getElementById('selectedQuotes');
+ if(!input||!box)return;
+ const files=[...input.files];
+ box.innerHTML=files.length?files.map((f,i)=>`<div>📄 ${i+1}. ${esc(f.name)} — ${(f.size/1024).toFixed(0)} KB</div>`).join(''):'';
+}
+async function analyzeFilesForCase(id, files, progressEl){
+ const c=cases.find(x=>x.id===id); if(!c) return;
+ const list=[...files];
+ const saved=[];
+ if(progressEl) progressEl.innerHTML='<div class="alert info">💾 Đang lưu và chuẩn bị đọc '+list.length+' file...</div>';
+ for(let i=0;i<list.length;i++){
+   try{saved[i]=await fileSave(id,list[i],'quote');}catch(e){saved[i]=null;console.warn('Không lưu được file',e);}
+ }
+ const results=[];
+ for(let i=0;i<list.length;i++){
+   const f=list[i];
+   if(progressEl) progressEl.innerHTML=`<div class="alert info">🤖 Đang đọc báo giá ${i+1}/${list.length}: ${esc(f.name)}<br><small>PDF bảng → OCR nhiều chế độ → giữ cấu trúc dòng/cột → đối chiếu Trước VAT + VAT + Sau VAT</small></div>`;
+   try{
+     const ext=f.name.split('.').pop().toLowerCase();
+     if(!['xlsx','xls','csv','pdf','docx','jpg','jpeg','png','webp'].includes(ext)) throw new Error('Định dạng chưa được hỗ trợ. Dùng PDF, DOCX, XLSX, XLS, CSV hoặc ảnh.');
+     const text=await extractFileText(f);
+     if(!String(text||'').trim()) throw new Error('Không đọc được nội dung file.');
+     const q=parseQuote(text,f.name,c);
+     q.fileId=saved[i]?.id||''; q.fileName=f.name; results.push(q);
+   }catch(e){
+     results.push({name:supplierFromFilename(f.name),total:null,beforeVat:null,vat:null,afterVat:null,time:'Chưa đọc được',warranty:'Chưa đọc được',items:[],error:e?.message||String(e),rawText:'',fileId:saved[i]?.id||'',fileName:f.name,arithmetic:{itemsTotal:0,itemsMatchTotal:null,vatMatches:null,totalMatches:null},quality:{score:0,readyForComparison:false,blockers:['Lỗi khi đọc/phân tích file: '+(e?.message||String(e))],checks:[]}});
+   }
+ }
+ c.quotes=results; c.suppliers=results.filter(x=>!isCustomerName(x.name)).length; c.supplierNames=results.filter(x=>!isCustomerName(x.name)).map(x=>x.name); c.status=results.length?'Đã phân tích':'Đang phân tích'; c.updatedAt=new Date().toISOString(); save();
+ if(progressEl) progressEl.innerHTML=`<div class="alert ok">✓ Đã xử lý ${results.length}/${list.length} báo giá. Dữ liệu đã được chuẩn hóa và kiểm tra chéo.</div>`;
+ return results;
+}
+async function reanalyzeSavedQuotes(id){
+ const c=cases.find(x=>x.id===id); if(!c)return;
+ const progress=document.getElementById('uploadProgress');
+ try{
+   const files=await filesForCase(id);
+   const quoteFiles=files.filter(f=>String(f.type||'').toLowerCase()==='quote' || /\.(pdf|docx|xlsx|xls|csv|jpg|jpeg|png|webp)$/i.test(f.name));
+   if(!quoteFiles.length){alert('Không tìm thấy file báo giá đã lưu trong hồ sơ.');return;}
+   const results=[];
+   for(let i=0;i<quoteFiles.length;i++){
+     if(progress)progress.innerHTML=`<div class="alert info">🔄 Đọc lại ${i+1}/${quoteFiles.length}: ${esc(quoteFiles[i].name)}</div>`;
+     const rec=await fileGet(quoteFiles[i].id);
+     if(!rec?.blob)continue;
+     try{
+       const text=await extractFileText(rec.blob);
+       const q=parseQuote(text,rec.name,c);
+       q.fileId=rec.id;q.fileName=rec.name;results.push(q);
+     }catch(e){
+       results.push({name:supplierFromFilename(rec.name),total:null,beforeVat:null,vat:null,time:'Chưa đọc được',warranty:'Chưa đọc được',items:[],error:e?.message||String(e),rawText:'',fileId:rec.id,fileName:rec.name,arithmetic:{itemsTotal:0,itemsMatchTotal:null,vatMatches:null,totalMatches:null},quality:{score:0,readyForComparison:false,financialReady:false,blockers:['Lỗi đọc: '+(e?.message||String(e))],checks:[]}});
+     }
+   }
+   c.quotes=results;c.suppliers=results.filter(x=>!isCustomerName(x.name)).length;c.supplierNames=results.filter(x=>!isCustomerName(x.name)).map(x=>x.name);c.updatedAt=new Date().toISOString();c.status='Đã phân tích';save();
+   openCase(id);
+   const btn=[...document.querySelectorAll('.tab')].find(x=>x.textContent.includes('④ So sánh'));if(btn)tab(btn,'compare');
+ }catch(e){if(progress)progress.innerHTML='<div class="alert warn">Đọc lại thất bại: '+esc(e.message||String(e))+'</div>';}
+}
+
+async function analyzeUploadedQuotes(id){
+ const input=document.getElementById('quoteFiles'), progress=document.getElementById('uploadProgress');
+ if(!input||!input.files.length){alert('Vui lòng chọn ít nhất 1 file báo giá / tài liệu.');return;}
+ await analyzeFilesForCase(id,[...input.files],progress);
+ input.value='';
+ setTimeout(()=>{openCase(id); const btn=[...document.querySelectorAll('.tab')].find(x=>x.textContent.includes('③ AI đọc dữ liệu')); if(btn) tab(btn,'ai');},500);
+}
+
+async function extractFileText(file){
+ const ext=file.name.split('.').pop().toLowerCase();
+ if(ext==='csv') return await file.text();
+ if(ext==='xlsx'||ext==='xls'){
+   if(!await ensureReaders('xlsx'))throw new Error('Chưa tải được bộ đọc Excel. Hãy mở máy có Internet rồi tải lại trang.');
+   const data=await file.arrayBuffer();
+   const wb=XLSX.read(data,{type:'array',cellDates:true,cellNF:true,cellText:true});
+   return wb.SheetNames.map(s=>{
+     const ws=wb.Sheets[s];
+     const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});
+     return ['--- SHEET: '+s+' ---',...rows.map(r=>r.map(v=>String(v??'').trim()).join(' | '))].join('\n');
+   }).join('\n');
+ }
+ if(ext==='docx'){
+   if(!await ensureReaders('docx'))throw new Error('Chưa tải được bộ đọc DOCX. Hãy mở máy có Internet rồi tải lại trang.');
+   const zip=await JSZip.loadAsync(await file.arrayBuffer());
+   const xml=await zip.file('word/document.xml').async('text');
+   return extractDocxRows(xml);
+ }
+ if(ext==='pdf'){
+   return await extractPdfText(file);
+ }
+ if(['jpg','jpeg','png','webp'].includes(ext)){
+   if(!await ensureReaders('ocr'))throw new Error('Chưa tải được OCR. Hãy mở máy có Internet rồi tải lại trang.');
+   const r=await Tesseract.recognize(file,'vie+eng',{logger:()=>{}});
+   return r.data.text||'';
+ }
+ if(ext==='doc') throw new Error('File .DOC cũ không được trình duyệt đọc ổn định. Hãy lưu lại thành .DOCX hoặc PDF.');
+ throw new Error('Định dạng chưa hỗ trợ. Dùng PDF, XLSX, XLS, CSV, DOCX hoặc ảnh JPG/PNG.');
+}
+
+function decodeXml(s){
+ return String(s||'').replace(/<w:tab[^>]*\/>/g,'\t').replace(/<w:br[^>]*\/>/g,'\n').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&#(\d+);/g,(_,n)=>String.fromCharCode(Number(n)));
+}
+function extractDocxRows(xml){
+ const rows=[];
+ const trMatches=xml.match(/<w:tr[\s\S]*?<\/w:tr>/g)||[];
+ for(const tr of trMatches){
+   const cells=[];
+   const tcMatches=tr.match(/<w:tc[\s\S]*?<\/w:tc>/g)||[];
+   for(const tc of tcMatches){
+     const texts=[...tc.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)].map(m=>decodeXml(m[1]));
+     const v=texts.join(' ').replace(/\s+/g,' ').trim();
+     cells.push(v);
+   }
+   if(cells.some(Boolean)) rows.push(cells.join(' | '));
+ }
+ const paras=[...xml.matchAll(/<w:p[\s\S]*?<\/w:p>/g)].map(m=>{
+   const texts=[...m[0].matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)].map(x=>decodeXml(x[1]));
+   return texts.join(' ').replace(/\s+/g,' ').trim();
+ }).filter(Boolean);
+ const all=[...rows];
+ for(const x of paras) if(!all.includes(x)) all.push(x);
+ return all.join('\n');
+}
+
+async function extractPdfText(file){
+  await ensureReaders('pdf');
+  const pdfjs=window.pdfjsLib;
+  if(!pdfjs) throw new Error('Không tải được bộ đọc PDF. Kiểm tra Internet hoặc dùng nút Kiểm tra bộ đọc.');
+  const data=await file.arrayBuffer();
+  let pdf;
+  try{
+    pdf=await pdfjs.getDocument({data,disableWorker:true,isEvalSupported:true,useWorkerFetch:false,disableFontFace:false}).promise;
+  }catch(e){
+    throw new Error('PDF.js không mở được PDF: '+(e?.message||e));
+  }
+
+  const pages=[]; let textChars=0;
+  for(let p=1;p<=pdf.numPages;p++){
+    const page=await pdf.getPage(p);
+    const content=await page.getTextContent({normalizeWhitespace:false,disableCombineTextItems:false});
+    const items=(content.items||[]).filter(x=>String(x.str||'').trim());
+    const rows=groupPdfItems(items);
+    const text=rows.join('\n');
+    pages.push({number:p,text,items});
+    textChars+=text.replace(/\s/g,'').length;
+  }
+
+  const native=pages.map(x=>`--- TRANG ${x.number} ---\n${x.text}`).join('\n');
+  const tableSignal=/STT|NỘI DUNG|NỘI DUNG CÔNG VIỆC|SỐ LƯỢNG|ĐƠN GIÁ|THÀNH TIỀN|TỔNG|CỘNG|THUẾ|VAT|BẢNG BÁO GIÁ|BẢNG BÁO GIÁ DỊCH VỤ/i.test(native);
+
+  // V58 table-reader principle:
+  // 1) Native PDF text is retained.
+  // 2) Every page that may contain a quotation table is OCR'd with two table-friendly
+  //    segmentation modes. This prevents the “scan has the number but summary lost it”
+  //    problem seen with the Tổng Vệ Sinh Việt quotation.
+  // 3) For fully scanned PDFs (no native text), OCR all pages.
+  if(!window.Tesseract) await ensureReaders('ocr');
+  if(!window.Tesseract){
+    if(native.trim()) return native;
+    throw new Error('PDF không có lớp chữ và OCR chưa tải được.');
+  }
+
+  const targets=pages.filter(x=>tableSignal || /báo giá|bao gia|quote|quotation/i.test(x.text) || x.items.length<15)
+                      .map(x=>({number:x.number,page:null}));
+  const useTargets=targets.length?targets:pages.map(x=>({number:x.number,page:null}));
+  const ocr=await ocrPdfPagesV49(pdf,useTargets);
+  const combined=[native,ocr].filter(Boolean).join('\n');
+  if(!combined.trim()) throw new Error('Không đọc được nội dung PDF.');
+  return combined;
+}
+
+function ocrWordsToLayoutV49(words){
+  const ws=(words||[]).filter(w=>String(w.text||'').trim()).map(w=>({
+    text:String(w.text||'').trim(),
+    left:Number(w.bbox?.x0||0),right:Number(w.bbox?.x1||0),
+    top:Number(w.bbox?.y0||0),bottom:Number(w.bbox?.y1||0)
+  })).filter(w=>w.text);
+  const rows=[];
+  for(const w of ws){
+    let row=rows.find(r=>Math.abs(r.top-w.top)<=Math.max(16,(r.bottom-r.top)*0.7));
+    if(!row){row={top:w.top,bottom:w.bottom,words:[]};rows.push(row)}
+    row.words.push(w); row.bottom=Math.max(row.bottom,w.bottom);
+  }
+  rows.sort((a,b)=>a.top-b.top);
+  return rows.map(r=>{
+    r.words.sort((a,b)=>a.left-b.left);
+    let out='',prev=null;
+    for(const w of r.words){
+      if(prev!=null){
+        const gap=w.left-prev;
+        // Large horizontal gaps in a quotation table are column separators.
+        out += gap>55 ? ' | ' : ' ';
+      }
+      out+=w.text; prev=w.right;
+    }
+    return out.trim();
+  }).filter(Boolean).join('\n');
+}
+
+function normalizeOcrTextV49(s){
+  return String(s||'')
+    .replace(/\r/g,'')
+    .replace(/[“”]/g,'"').replace(/[‘’]/g,"'")
+    // OCR frequently reads the digit 8 as § in scanned quotation tables.
+    .replace(/§(?=[.,]\s*\d)/g,'8')
+    .replace(/(?<=\d)[Oo](?=[\d.,])/g,'0')
+    .replace(/(?<=\d)[Il](?=[\d.,])/g,'1')
+    .replace(/(\d)\s*[Oo]\s*(\d)/g,'$10$2')
+    .replace(/(\d)\s*[Il]\s*(\d)/g,'$1$2')
+    .replace(/\s*\/\s*/g,'/')
+    .replace(/[ \t]+/g,' ')
+    .replace(/\n{3,}/g,'\n')
+    .trim();
+}
+
+async function ocrPdfPagesV49(pdf,targets){
+  const out=[];
+  for(const t of targets){
+    const page=t.page || await pdf.getPage(t.number);
+    const viewport=page.getViewport({scale:3.5});
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
+    const ctx=canvas.getContext('2d',{willReadFrequently:true});
+    await page.render({canvasContext:ctx,viewport}).promise;
+    const passes=[];
+    // Multiple page segmentation modes are intentional: quotation tables and
+    // scanned invoices behave very differently for OCR. The financial engine
+    // later chooses only values that reconcile arithmetically.
+    for(const psm of ['3','4','6','11']){
+      try{
+        const r=await Tesseract.recognize(canvas,'vie+eng',{
+          logger:()=>{},
+          tessedit_pageseg_mode:psm,
+          preserve_interword_spaces:'1'
+        });
+        const raw=normalizeOcrTextV49(r.data.text||'');
+        const layout=normalizeOcrTextV49(ocrWordsToLayoutV49(r.data.words||[]));
+        if(raw) passes.push(raw);
+        if(layout) passes.push(layout);
+      }catch(e){}
+    }
+    // A second high-contrast pass helps scanned quotation tables where thin
+    // grey grid lines interfere with digit recognition.
+    try{
+      const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+      const d=img.data;
+      for(let i=0;i<d.length;i+=4){
+        const g=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114);
+        const v=g<205?0:255; d[i]=d[i+1]=d[i+2]=v;
+      }
+      ctx.putImageData(img,0,0);
+      for(const psm of ['6','11']){
+        try{
+          const r=await Tesseract.recognize(canvas,'vie+eng',{logger:()=>{},tessedit_pageseg_mode:psm,preserve_interword_spaces:'1'});
+          const raw=normalizeOcrTextV49(r.data.text||'');
+          const layout=normalizeOcrTextV49(ocrWordsToLayoutV49(r.data.words||[]));
+          if(raw) passes.push(raw);
+          if(layout) passes.push(layout);
+        }catch(e){}
+      }
+    }catch(e){}
+    const unique=[];
+    for(const x of passes){if(x && !unique.some(y=>y===x)) unique.push(x);}
+    if(unique.length) out.push(`--- OCR TRANG ${t.number} ---\n${unique.join('\n')}`);
+    canvas.width=1; canvas.height=1;
+  }
+  return out.join('\n');
+}
+async function ensureReaders(kind){
+ const specs={
+  pdf:[
+   ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',()=>window.pdfjsLib],
+   ['https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',()=>window.pdfjsLib],
+   ['https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js',()=>window.pdfjsLib]
+  ],
+  ocr:[
+   ['https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',()=>window.Tesseract],
+   ['https://unpkg.com/tesseract.js@5/dist/tesseract.min.js',()=>window.Tesseract]
+  ],
+  xlsx:[
+   ['https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',()=>window.XLSX],
+   ['https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js',()=>window.XLSX]
+  ],
+  docx:[
+   ['https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',()=>window.JSZip],
+   ['https://unpkg.com/jszip@3.10.1/dist/jszip.min.js',()=>window.JSZip]
+  ]
+ };
+ if((kind==='pdf'||kind==='ocr') && !window.Tesseract && kind==='ocr') kind='ocr';
+ if(kind==='pdf' && window.pdfjsLib)return true;
+ if(kind==='ocr' && window.Tesseract)return true;
+ if(kind==='xlsx' && window.XLSX)return true;
+ if(kind==='docx' && window.JSZip)return true;
+ const arr=specs[kind]||[];
+ for(const [url,test] of arr){
+   try{
+    await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.onload=()=>resolve();s.onerror=reject;document.head.appendChild(s)});
+    if(test())return true;
+   }catch(e){}
+ }
+ return false;
+}
+
+function groupPdfItems(items){
+  // Preserve PDF table columns using x positions.  We use a two-stage row builder:
+  // 1) same baseline => same row; 2) large horizontal gaps => column separators.
+  const rows=[];
+  for(const it of items){
+    const x=Number(it.transform?.[4]||0), y=Number(it.transform?.[5]||0);
+    const txt=String(it.str||'').replace(/\s+/g,' ').trim();
+    if(!txt) continue;
+    let row=rows.find(r=>Math.abs(r.y-y)<=2.5);
+    if(!row){row={y,items:[]};rows.push(row)}
+    row.items.push({x,y,txt,w:Number(it.width||0)});
+  }
+  rows.sort((a,b)=>b.y-a.y);
+  return rows.map(r=>{
+    const a=r.items.sort((m,n)=>m.x-n.x);
+    let out=''; let prevEnd=null;
+    for(const cell of a){
+      const gap=prevEnd==null?0:cell.x-prevEnd;
+      if(prevEnd!=null){
+        // 12pt is enough to separate table columns without splitting normal words.
+        if(gap>=12) out+=' | '; else out+=' ';
+      }
+      out+=cell.txt;
+      prevEnd=cell.x+cell.w;
+    }
+    return out.replace(/\s+/g,' ').trim();
+  }).filter(Boolean);
+}
+
+function stripVN(value){
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/đ/g,'d').replace(/Đ/g,'D')
+    .replace(/[^A-Za-z0-9\s]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function normalizeMoney(raw){
+ let x=String(raw??'').replace(/[^0-9.,\s-]/g,'').replace(/\s+/g,'').trim();
+ if(!x)return 0;
+ if(x.includes('.')&&x.includes(',')){
+   if(x.lastIndexOf(',')>x.lastIndexOf('.')) x=x.replace(/\./g,'').replace(',','.');
+   else x=x.replace(/,/g,'');
+ }else if(x.includes('.')||x.includes(',')){
+   const sep=x.includes(',')?',':'.';
+   const parts=x.split(sep);
+   if(parts.length>2 || (parts.length===2 && parts[1].length===3)) x=x.replace(/[.,]/g,'');
+ }
+ const n=Number(x); return Number.isFinite(n)?n:0;
+}
+function cleanSupplierName(name){
+ return String(name||'').replace(/^(báo giá|bao gia|quotation|quote)\s*[:_-]?\s*/i,'').replace(/^[-–—:|]+/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
+}
+function supplierFromFilename(filename){
+ const base=cleanSupplierName(filename.replace(/\.[^.]+$/,''));
+ return base || 'Chưa xác định NCC / Nhà thầu';
+}
+const CUSTOMER_NAMES = ['GONSA','CÔNG TY CỔ PHẦN GONSA','CONG TY CO PHAN GONSA'];
+function isCustomerName(name){
+ const n=stripVN(String(name||'')).toUpperCase();
+ return CUSTOMER_NAMES.some(x=>n===stripVN(x).toUpperCase() || n.includes(stripVN(x).toUpperCase()));
+}
+function companyCandidates(text){
+ const out=[];
+ const lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ for(let i=0;i<Math.min(lines.length,35);i++){
+   const line=lines[i];
+   if(/^(kính gửi|kinh gui|to\s*:|địa chỉ thi công|dia chi thi cong)/i.test(line)) continue;
+   const m=line.match(/((?:CÔNG TY|CONG TY|CTY)\s+(?:TNHH|CP|CỔ PHẦN|CO PHAN)?[^\n|]{2,140})/i);
+   if(m){
+     const v=cleanSupplierName(m[1]).replace(/\s+(?:địa chỉ|dia chi|mst|mã số thuế|ma so thue).*$/i,'').trim();
+     if(v.length>=6 && !isCustomerName(v) && !/khách hàng|customer|địa chỉ|đien thoại|điện thoại/i.test(v)) out.push(v);
+   }
+ }
+ return [...new Set(out)];
+}
+function findSupplier(text,filename){
+ const fileBase=supplierFromFilename(filename);
+ if(fileBase && !isCustomerName(fileBase) && /(?:công ty|cong ty|cty)/i.test(fileBase)) return fileBase;
+
+ // Prefer issuer/company header BEFORE the customer/greeting section.
+ const candidates=companyCandidates(text);
+ if(candidates.length) return candidates[0];
+
+ // Explicit supplier labels, but never accept the customer's company.
+ const lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ for(const line of lines){
+   const m=line.match(/(?:tên\s*(?:công\s*ty|đơn\s*vị)|nhà\s*cung\s*cấp|ncc|supplier|đơn\s*vị\s*cung\s*cấp|bên\s*cung\s*cấp)\s*[:\-–—|]?\s*([^|]{3,140})/i);
+   if(m){
+     const v=cleanSupplierName(m[1]);
+     if(v.length>=3 && !isCustomerName(v) && !/khách hàng|địa chỉ|điện thoại|mst|mã số thuế/i.test(v)) return v;
+   }
+ }
+ // Last resort: scan company strings, excluding customer.
+ const all=[...text.matchAll(/((?:CÔNG TY|CONG TY|CTY)\s+(?:TNHH|CP|CỔ PHẦN|CO PHAN)?[^\n|]{2,140})/ig)]
+   .map(m=>cleanSupplierName(m[1]))
+   .filter(v=>v.length>=6 && !isCustomerName(v) && !/địa chỉ|dia chi|điện thoại|dien thoai|mst|mã số thuế/i.test(v));
+ return all[0] || (fileBase && !isCustomerName(fileBase) ? fileBase : 'Chưa xác định NCC / Nhà thầu');
+}
+function numericTokens(s){
+ return [...String(s||'').matchAll(/(?<![A-Za-zÀ-ỹ])(?:\d{1,3}(?:[.,\s]\d{3})+|\d+(?:[.,]\d{1,2})?)(?![A-Za-zÀ-ỹ])/g)].map(m=>({raw:m[0],value:normalizeMoney(m[0]),index:m.index})).filter(x=>x.value>0);
+}
+function findLabeledMoney(text,patterns){
+ const lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ for(const line of lines){
+   const low=stripVN(line.toLowerCase());
+   if(patterns.some(p=>low.includes(stripVN(p)))){
+     const nums=numericTokens(line).filter(x=>x.value>1000&&x.value<1e13);
+     if(nums.length) return nums[nums.length-1].value;
+   }
+ }
+ return null;
+}
+function findVatRate(text){
+ const lines=String(text||'').split(/\n+/);
+ for(const line of lines){
+   const m1=line.match(/(?:VAT|GTGT|thuế\s*GTGT|thuế\s*giá\s*trị\s*gia\s*tăng)[^%\d]{0,25}(\d+(?:[.,]\d+)?)\s*%/i);
+   if(m1)return Number(String(m1[1]).replace(',','.'));
+   const m2=line.match(/(\d+(?:[.,]\d+)?)\s*%[^\n]{0,25}(?:VAT|GTGT|thuế\s*GTGT|thuế)/i);
+   if(m2)return Number(String(m2[1]).replace(',','.'));
+ }
+ const m=text.match(/(?:VAT|GTGT|thuế\s*GTGT|thuế\s*giá\s*trị\s*gia\s*tăng)[^%\d]{0,25}(\d+(?:[.,]\d+)?)\s*%/i)
+   || text.match(/(\d+(?:[.,]\d+)?)\s*%[^\n]{0,25}(?:VAT|GTGT|thuế\s*GTGT|thuế)/i);
+ return m?Number(String(m[1]).replace(',','.')):null;
+}
+
+function findDate(text){
+ const m=text.match(/\b([0-3]?\d)[\/.\-]([0-1]?\d)[\/.\-](20\d{2})\b/);
+ if(m)return `${String(m[1]).padStart(2,'0')}/${String(m[2]).padStart(2,'0')}/${m[3]}`;
+ const v=text.match(/(?:ngay|ngày)\s+([0-3]?\d)\s+(?:thang|tháng)\s+([0-1]?\d)\s+(?:nam|năm|nim|nǎm)\s+(20\d{2})/i);
+ return v?`${String(v[1]).padStart(2,'0')}/${String(v[2]).padStart(2,'0')}/${v[3]}`:'';
+}
+
+function findAmountInWords(text){
+ const m=text.match(/(?:bằng chữ|bang chu|số tiền bằng chữ|so tien bang chu)\s*[:\-|]?\s*([^\n]+)/i);
+ return m ? m[1].trim() : '';
+}
+function collectMoneyCandidates(text){
+ const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+ const norm=s=>stripVN(String(s||'').toLowerCase()).replace(/\s+/g,' ').trim();
+ const fix=s=>String(s||'').replace(/[§$]/g,'8').replace(/(?<=\d)[Oo](?=\d)/g,'0');
+ const money=s=>{const ns=numericTokens(fix(s)).filter(x=>x.value>=1000&&x.value<1e13);return ns.length?ns.at(-1).value:null};
+ const out={before:[],vat:[],after:[],all:[]};
+ const push=(kind,val,line,score,source)=>{if(val==null)return;const c={value:val,line,score,source};out[kind].push(c);out.all.push({...c,kind})};
+ for(let i=0;i<lines.length;i++){
+   const raw=lines[i], low=norm(raw), val=money(raw), next=lines[i+1]||'', nextVal=money(next);
+   const hasBefore=/\b(tong\s*(?:tam\s*tinh|truoc\s*vat|truoc\s*thue|tien\s*truoc\s*vat)|subtotal|cong\s*(?:truoc\s*vat|truoc\s*thue))\b/i.test(low);
+   const hasVat=/\b(thue\s*(?:vat|gtgt)|tien\s*thue)\b|\bvat\b/i.test(low);
+   const hasAfter=/\b(tong\s*(?:cong\s*sau\s*thue|cong\s*sau\s*vat|sau\s*thue|sau\s*vat|thanh\s*toan)|grand\s*total|thanh\s*tien)\b/i.test(low);
+   const bareTotal=/^tong\b|^cong\b/i.test(low);
+   if(val!=null){
+     if(hasAfter) push('after',val,raw,100,'labeled');
+     else if(hasVat) push('vat',val,raw,100,'labeled');
+     else if(hasBefore) push('before',val,raw,100,'labeled');
+     else if(bareTotal) push('before',val,raw,60,'bare-total');
+   }
+   if(nextVal!=null){
+     if(/^(?:tong\s*(?:tam\s*tinh|truoc\s*vat|truoc\s*thue)?|subtotal|cong\s*(?:truoc\s*vat|truoc\s*thue)?)$/i.test(low)) push('before',nextVal,next,90,'next-line-label');
+     if(/^(?:thue\s*(?:vat|gtgt)|vat|tien\s*thue)$/i.test(low)) push('vat',nextVal,next,90,'next-line-label');
+     if(/^(?:tong\s*(?:cong\s*sau\s*thue|cong\s*sau\s*vat|sau\s*thue|sau\s*vat|thanh\s*toan)|thanh\s*tien|grand\s*total)$/i.test(low)) push('after',nextVal,next,90,'next-line-label');
+   }
+   // OCR often separates the label from the number but leaves the label in a longer cell.
+   if(!val && nextVal!=null){
+     if(hasAfter) push('after',nextVal,next,75,'label-next');
+     else if(hasVat) push('vat',nextVal,next,75,'label-next');
+     else if(hasBefore) push('before',nextVal,next,75,'label-next');
+   }
+ }
+ // Strong signal: “Bằng chữ” is always a final payable amount, never a subtotal.
+ const bw=lines.join('\n').match(/(?:bang chu|bằng chữ|số tiền bằng chữ|so tien bang chu)\s*[:\-|]?\s*([^\n]+)/i);
+ if(bw){
+   const wordTotal=parseVietnameseMoneyWords(bw[1]);
+   if(wordTotal!=null) push('after',wordTotal,bw[1].trim(),110,'amount-in-words');
+ }
+ return out;
+}
+function chooseBestCandidate(arr){
+ if(!arr?.length)return null;
+ return [...arr].sort((a,b)=>b.score-a.score)[0]?.value ?? null;
+}
+function findTotal(text){
+ const c=collectMoneyCandidates(text);
+ let b=chooseBestCandidate(c.before), v=chooseBestCandidate(c.vat), a=chooseBestCandidate(c.after);
+ const rate=findVatRate(text);
+ // Use arithmetic relationships to resolve competing OCR/native candidates.
+ if(a!=null && v!=null){
+   const derived=a-v;
+   if(derived>=0){
+     const matching=c.before.find(x=>Math.abs(x.value-derived)<=Math.max(1000,derived*.005));
+     if(matching) b=matching.value;
+     else if(b==null) b=derived;
+   }
+ }
+ if(b!=null && rate!=null){
+   const derivedVat=Math.round(b*rate/100);
+   const matching=c.vat.find(x=>Math.abs(x.value-derivedVat)<=Math.max(1000,derivedVat*.01));
+   if(matching) v=matching.value;
+ }
+ if(b!=null && v!=null){
+   const derivedAfter=b+v;
+   const matching=c.after.find(x=>Math.abs(x.value-derivedAfter)<=Math.max(1000,derivedAfter*.005));
+   if(matching) a=matching.value;
+   else if(a==null) a=derivedAfter;
+ }
+ if(a!=null && rate!=null && b==null) b=Math.round(a/(1+rate/100));
+ if(a!=null && b!=null && v==null && a>=b) v=a-b;
+ return {beforeVat:b,vatAmount:v,afterVat:a,amountInWords:findAmountInWords(text),candidates:c};
+}
+
+function findContext(text,labels){
+ const lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ const ordered=[...labels].sort((a,b)=>String(b).length-String(a).length);
+ const hits=[];
+ for(let i=0;i<lines.length;i++){
+   const original=lines[i];
+   const line=stripVN(original.toLowerCase());
+   const label=ordered.find(x=>line.includes(stripVN(String(x).toLowerCase())));
+   if(!label)continue;
+   const l=stripVN(String(label).toLowerCase());
+   const pos=line.indexOf(l);
+   let value=pos>=0?line.slice(pos+l.length).replace(/^\s*[:|\-–—]?\s*/,'').trim():'';
+   if(!value){
+     const nxt=stripVN(lines[i+1]||'');
+     if(nxt && !/^(ghi chu|quy trinh|quy cach|bao gia|bang bao gia|thanh toan|payment|vat|tong|cong)$/i.test(nxt)) value=nxt;
+   }
+   if(l.includes('bao hanh')){
+     value=value.replace(/(?:,|;|\.|\s)*(?:so|hotline|dien thoai)\s*(?:hotline)?\s*[:\-]?\s*0\d[\d.\s-]{7,}/ig,'').replace(/\b0\d[\d.\s-]{7,}\b/g,'').trim();
+   }
+   if(value.length>=3)hits.push(value);
+ }
+ return [...new Set(hits)].filter(Boolean).slice(0,3).join(' • ').slice(0,500);
+}
+
+const COMMON_UNITS=['m2','m²','m3','m³','cái','cay','bộ','bo','lần','lan','kg','gói','goi','chai','thùng','thung','chiếc','chiec','người','nguoi','tháng','thang','ngày','ngay','giờ','gio','hạng mục','hang muc','ống','ong','set','lot','phần','phan'];
+function moneyLike(s){return /^-?\d{1,3}(?:[.,\s]\d{3})+(?:[.,]\d+)?$|^-?\d+(?:[.,]\d+)?$/.test(String(s).trim());}
+function unitLike(s){const x=stripVN(String(s||'').toLowerCase()).replace(/\./g,'');return COMMON_UNITS.some(u=>x===stripVN(u).replace(/\./g,''))}
+function parseNumericTail(line){
+ const clean=line.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
+
+ // Pattern A: QTY | UNIT | UNIT PRICE | TOTAL
+ let m=clean.match(/(?:^|\|\s*|\s+)(\d+(?:[.,]\d+)?)\s*(?:\|\s*|\s+)([a-zA-ZÀ-ỹ²³0-9.]+)\s*(?:\|\s*|\s+)(\d{1,3}(?:[.,]\d{3})+|\d+)\s*(?:\|\s*|\s+)(\d{1,3}(?:[.,]\d{3})+|\d+)\s*$/i);
+ if(m){
+   const qty=normalizeMoney(m[1]), unitLabel=m[2], unit=normalizeMoney(m[3]), total=normalizeMoney(m[4]);
+   if(qty>0&&qty<=100000&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03))
+     return {unitLabel,qty,unit,total};
+ }
+
+ // Pattern B: UNIT | QTY | UNIT PRICE | TOTAL
+ m=clean.match(/(?:^|\|\s*|\s+)([a-zA-ZÀ-ỹ²³0-9.]+)\s*(?:\|\s*|\s+)(\d+(?:[.,]\d+)?)\s*(?:\|\s*|\s+)(\d{1,3}(?:[.,]\d{3})+|\d+)\s*(?:\|\s*|\s+)(\d{1,3}(?:[.,]\d{3})+|\d+)\s*$/i);
+ if(m && unitLike(m[1])){
+   const unitLabel=m[1],qty=normalizeMoney(m[2]),unit=normalizeMoney(m[3]),total=normalizeMoney(m[4]);
+   if(qty>0&&qty<=100000&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03))
+     return {unitLabel,qty,unit,total};
+ }
+
+ // Pattern C: plain spaces, with a unit between qty and price.
+ m=clean.match(/(?:^|\s)(\d+(?:[.,]\d+)?)\s+(m²|m2|m³|m3|cái|cay|bộ|bo|lần|lan|kg|gói|goi|chai|thùng|thung|chiếc|chiec|người|nguoi|tháng|thang|ngày|ngay|giờ|gio|ống|ong|set|lot|phần|phan)\s+(\d{1,3}(?:[.,]\d{3})+|\d+)\s+(\d{1,3}(?:[.,]\d{3})+|\d+)\s*$/i);
+ if(m){
+   const qty=normalizeMoney(m[1]),unitLabel=m[2],unit=normalizeMoney(m[3]),total=normalizeMoney(m[4]);
+   if(qty>0&&qty<=100000&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03))
+     return {unitLabel,qty,unit,total};
+ }
+ return null;
+}
+
+function parseItemLine(line){
+ const clean=line.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
+ if(clean.length<4||clean.length>800)return null;
+ const low=stripVN(clean.toLowerCase());
+ const metaPatterns=['van phong chinh','chi nhanh','dia chi','dien thoai','website','email','mst','ma so thue','so tai khoan','tai khoan','ngan hang','kinh gui','quy khach hang','bang bao gia','bao gia dich vu','thong tin so tai khoan','gia da bao gom','hoa chat su dung','may moc su dung','quy cach thuc hien','quy trinh','thanh toan','ghi chu','so tien bang chu','chiu trach nhiem bao gia','tong tam tinh','tong cong','tong truoc','tong sau','tong thanh toan','tien thue','thue gtgt','vat','subtotal','grand total'];
+ if(metaPatterns.some(p=>low.includes(p)))return null;
+ if(/\b(19|20)\d{2}\b/.test(clean) && /(ngay|thang|date|tp\.?\s*ho|chi nhanh)/i.test(low))return null;
+ if(/\b0\d{8,10}\b|\b\d{3,4}[.\s]\d{3}[.\s]\d{3}\b/.test(clean))return null;
+
+ const parts=clean.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean);
+
+ // Most common PDF/Excel table layouts:
+ // [description | qty | unit | unit price | total]
+ // [STT | description | unit | qty | unit price | total]
+ if(parts.length>=5){
+   const last=parts.slice(-1)[0], p1=parts.at(-2), p2=parts.at(-3), p3=parts.at(-4);
+   const totalTok=numericTokens(last), priceTok=numericTokens(p1), qtyTok=numericTokens(p2);
+   if(totalTok.length&&priceTok.length&&qtyTok.length&&unitLike(p3)){
+     const qty=qtyTok[0].value, unit=priceTok.at(-1).value, total=totalTok.at(-1).value;
+     if(qty>0&&qty<=100000&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03)){
+       let descParts=parts.slice(0,-4);
+       // If first cell is STT, discard it.
+       if(descParts.length && /^\d+[.)]?$/.test(descParts[0])) descParts=descParts.slice(1);
+       const desc=descParts.join(' | ');
+       if(desc.length>=3)return [desc.slice(0,260),qty,unit,total];
+     }
+   }
+   // [STT | description | qty | unit | price | total]
+   if(parts.length>=6){
+     const qtyTok2=numericTokens(parts.at(-4)), priceTok2=numericTokens(parts.at(-2)), totalTok2=numericTokens(parts.at(-1));
+     if(qtyTok2.length&&priceTok2.length&&totalTok2.length&&unitLike(parts.at(-3))){
+       const qty=qtyTok2[0].value,unit=priceTok2.at(-1).value,total=totalTok2.at(-1).value;
+       if(qty>0&&qty<=100000&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03)){
+         let descParts=parts.slice(0,-4);
+         if(descParts.length && /^\d+[.)]?$/.test(descParts[0])) descParts=descParts.slice(1);
+         const desc=descParts.join(' | ');
+         if(desc.length>=3)return [desc.slice(0,260),qty,unit,total];
+       }
+     }
+   }
+ }
+ // [description | qty | unit price | total]
+ if(parts.length>=4){
+   const q=numericTokens(parts.at(-3)),u=numericTokens(parts.at(-2)),t=numericTokens(parts.at(-1));
+   if(q.length&&u.length&&t.length){
+     const qty=q[0].value,unit=u.at(-1).value,total=t.at(-1).value;
+     if(qty>0&&qty<=100000&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03)){
+       let desc=parts.slice(0,-3).join(' | ');
+       if(desc && !/^\d+[.)]?$/.test(desc)) return [desc.slice(0,260),qty,unit,total];
+     }
+   }
+ }
+
+ // Native PDF table row: description + UNIT + QTY + UNIT PRICE + AMOUNT.
+ const nativeRow=clean.match(/^(.+?)\s+(m2|m²|cái|cay|bộ|bo|kg|gói|goi|chai|thùng|thung|chiếc|chiec|ngày|ngay|giờ|gio|ống|ong|set|lot|phần|phan)\s+(\d+(?:[.,]\d+)?)\s+(\d{1,3}(?:[.,]\d{3})+)\s+(\d{1,3}(?:[.,]\d{3})+)$/i);
+ if(nativeRow){
+   const qty=normalizeMoney(nativeRow[3]),unit=normalizeMoney(nativeRow[4]),total=normalizeMoney(nativeRow[5]);
+   if(qty>0&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03)) return [nativeRow[1].replace(/^[\d.)-]+\s*/,'').trim(),qty,unit,total];
+ }
+ // OCR scan pattern: description + quantity + unit + unit price[/unit] + amount.
+ const ocr=clean.match(/^(.+?)\s+(\d+(?:[.,]\d+)?)\s+(m2|m²|cái|cai|cay|bo|bộ|kg|goi|gói|chai|thung|thùng|chiec|chiếc|ngay|ngày|gio|giờ)\s+(\d{1,3}(?:[.,]\d{3})+)\s*\/?[^\s]*\s+(\d{1,3}(?:[.,]\d{3})+)$/i)
+   || clean.match(/^(.+?)\s+(\d+(?:[.,]\d+)?)\s+(m2|m²|cái|cai|cay|bo|bộ|kg|goi|gói|chai|thung|thùng|chiec|chiếc|ngay|ngày|gio|giờ)\s+(\d{1,3}(?:[.,]\d{3})+)\s*\/\s*(?:m2|m²|cái|cai|cay|bo|bộ|kg|goi|gói|chai|thung|thùng|chiec|chiếc)\s+(\d{1,3}(?:[.,]\d{3})+)$/i);
+ if(ocr){
+   const qty=normalizeMoney(ocr[2]), unit=normalizeMoney(ocr[4]), total=normalizeMoney(ocr[5]);
+   if(qty>0&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03)) return [ocr[1].replace(/^[\d.)-]+\s*/,'').trim(),qty,unit,total];
+ }
+ // Do not guess from arbitrary final numeric tokens. A line is an item only when its table columns or an explicit unit/quantity/price/amount pattern validate it.
+ return null;
+}
+function extractValidatedRows(text){
+ const out=[];
+ const seen=new Set();
+ const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+ const unitRe='m2|m²|m\s*2|cái|cai|cay|bộ|bo|kg|g|gói|goi|chai|thùng|thung|chiếc|chiec|ngày|ngay|giờ|gio|phần|phan|set|lot';
+ const add=(desc,qty,unit,total)=>{
+   desc=String(desc||'').replace(/^[\d.)\-\s]+/,'').trim();
+   if(!desc||!(qty>0&&qty<=100000&&unit>0&&total>0))return;
+   if(Math.abs(qty*unit-total)>Math.max(1000,total*.03))return;
+   const k=normalizeItemName(desc); if(k.length<3||seen.has(k))return;
+   seen.add(k); out.push([desc,qty,unit,total]);
+ };
+ for(const raw of lines){
+   const line=raw.replace(/[§S$](?=\d[.,]\d)/g,'8');
+   let m=line.match(new RegExp('^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s+('+unitRe+')\\s+(\\d[\\d.,]*)\\s*\\/\\s*(?:'+unitRe+')\\s+(\\d[\\d.,]*)$','i'));
+   if(!m)m=line.match(new RegExp('^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s+('+unitRe+')\\s+(\\d[\\d.,]*)\\s*\\/[^\\s]+\\s+(\\d[\\d.,]*)$','i'));
+   if(!m)m=line.match(new RegExp('^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s+('+unitRe+')\\s+(\\d[\\d.,]*)\\s+(\\d[\\d.,]*)$','i'));
+   if(m){add(m[1],normalizeMoney(m[2]),m[4]?normalizeMoney(m[4]):0,normalizeMoney(m[5]));continue;}
+   // Table rows with columns separated by multiple spaces, e.g. native PDF extraction.
+   const nums=[...line.matchAll(/\b\d{1,3}(?:[.,]\d{3})+(?:\b|$)/g)].map(x=>({raw:x[0],value:normalizeMoney(x[0]),index:x.index}));
+   if(nums.length>=3){
+     const last3=nums.slice(-3); const before=last3[0], price=last3[1], total=last3[2];
+     const prefix=line.slice(0,before.index).trim();
+     const qm=prefix.match(/(.+?)\s+(\d+(?:[.,]\d+)?)\s+('+unitRe+')\s*$/i);
+     if(qm)add(qm[1],normalizeMoney(qm[2]),price.value,total.value);
+   }
+ }
+ return out;
+}
+
+function recoverSplitTableRows(lines){
+ const out=[]; const seen=new Set();
+ const clean=s=>String(s||'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
+ const money=s=>{const ns=numericTokens(s).filter(x=>x.value>=1000&&x.value<1e13);return ns.length?ns.at(-1).value:null};
+ const qtyUnit=/^(\d+(?:[.,]\d+)?)\s*(m2|m²|m3|m³|cái|cai|bộ|bo|kg|gói|goi|chai|thùng|thung|chiếc|chiec|ngày|ngay|giờ|gio|phần|phan|set|lot)$/i;
+ const add=(desc,qty,unit,total)=>{
+   desc=clean(desc).replace(/^[\d.)\-\s]+/,'');
+   if(!desc||!(qty>0&&unit>0&&total>0)||qty>100000)return;
+   if(Math.abs(qty*unit-total)>Math.max(1000,total*.03))return;
+   const key=normalizeItemName(desc); if(key.length<3||seen.has(key))return;
+   seen.add(key); out.push([desc,qty,unit,total]);
+ };
+ for(let i=0;i<lines.length;i++){
+   const d=clean(lines[i]); if(!d)continue;
+   if(/^(stt|nội dung|noi dung|số lượng|so luong|đơn giá|don gia|thành tiền|thanh tien|tong|cộng|cong|vat|thuế|thue)/i.test(stripVN(d)))continue;
+   // Pattern 1: description on one line, then “400 cái”, “15.000/cái”, “6.000.000”.
+   const ql=clean(lines[i+1]||'').match(qtyUnit);
+   if(ql){
+     const priceLine=clean(lines[i+2]||'');
+     const amountLine=clean(lines[i+3]||'');
+     const price=money(priceLine), total=money(amountLine);
+     if(price!=null&&total!=null){ add(d,normalizeMoney(ql[1]),price,total); continue; }
+   }
+   // Pattern 2: description + quantity on separate line, price and amount on following lines.
+   const ql2=clean(lines[i+1]||'').match(/^(\d+(?:[.,]\d+)?)\s*(m2|m²|m3|m³|cái|cai|bộ|bo|kg|gói|goi|chai|thùng|thung|chiếc|chiec|ngày|ngay|giờ|gio|phần|phan|set|lot)$/i);
+   if(ql2){
+     const p=money(lines[i+2]||''), t=money(lines[i+3]||'');
+     if(p!=null&&t!=null){ add(d,normalizeMoney(ql2[1]),p,t); continue; }
+   }
+   // Pattern 3: all four values are on the same line but separators were lost.
+   const nums=[...d.matchAll(/\d{1,3}(?:[.,]\d{3})+|\d+(?:[.,]\d+)?/g)].map(m=>({raw:m[0],value:normalizeMoney(m[0]),index:m.index}));
+   if(nums.length>=3){
+     const last3=nums.slice(-3); const qty=last3[0].value,unit=last3[1].value,total=last3[2].value;
+     if(qty<=100000&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03)) add(d.slice(0,last3[0].index),qty,unit,total);
+   }
+ }
+ return out;
+}
+
+function parseItems(text,template){
+ const lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ const items=[]; const seen=new Set();
+ const add=(it)=>{
+   if(!it)return;
+   const [desc,qty,unit,total]=it;
+   const key=normalizeItemName(desc);
+   if(key.length<3||seen.has(key))return;
+   if(!(qty>0&&qty<=100000&&unit>0&&total>0))return;
+   if(Math.abs(qty*unit-total)>Math.max(1000,total*0.03))return;
+   seen.add(key); items.push([desc,qty,unit,total]);
+ };
+ const isHeader=x=>/stt|nội dung|noi dung|đơn vị|dvt|đvt|số lượng|so luong|đơn giá|don gia|thành tiền|thanh tien/i.test(stripVN(x));
+ const isSummary=x=>/^(stt\s*)?(tong|cong|tam tinh|subtotal|vat|thue|grand total|tong cong|tong thanh toan)/i.test(stripVN(x));
+
+ for(let i=0;i<lines.length;i++){
+   const line=lines[i];
+   if(isHeader(line)||isSummary(line))continue;
+   // First, use the existing arithmetic-validated parser.
+   add(parseItemLine(line));
+
+   // Native PDF wrapped row: sometimes PDF.js puts the description on previous lines and the numeric columns alone on this line.
+   const nr=line.match(/^(?:\d+\s+)?(m2|m²|cái|cay|bộ|bo|kg|gói|goi|chai|thùng|thung|chiếc|chiec|ngày|ngay|giờ|gio|ống|ong|set|lot|phần|phan)\s+(\d+(?:[.,]\d+)?)\s+(\d{1,3}(?:[.,]\d{3})+)\s+(\d{1,3}(?:[.,]\d{3})+)$/i);
+   if(nr){
+     const qty=normalizeMoney(nr[2]),unit=normalizeMoney(nr[3]),total=normalizeMoney(nr[4]);
+     if(qty>0&&unit>0&&total>0&&Math.abs(qty*unit-total)<=Math.max(1000,total*.03)){
+       let desc='';
+       for(let j=i-1;j>=Math.max(0,i-5);j--){
+         const prev=lines[j]; const pl=stripVN(prev);
+         if(!pl || isHeader(prev) || isSummary(prev)) continue;
+         if(/^(?:\d+[.)-]?\s*)?(?:m2|m²|cái|cay|bộ|bo|kg|gói|goi|chai|thùng|thung|chiếc|chiec|ngày|ngay|giờ|gio|ống|ong)\b/i.test(prev)) continue;
+         if(/^(?:-\s*)?(?:diện tích|dien tich|thảm lót|tham lot|thời gian|thoi gian|thời lượng|thoi luong)\s*:/i.test(prev)) continue;
+         if(/\b\d+(?:[.,]\d+)?\s*(?:m2|m²)\b/i.test(prev) && !/:$/.test(prev)) continue;
+         if(/[:：]\s*$/.test(prev) || /(?:vệ sinh|giặt|cung cấp|dịch vụ)\s+(?:thảm|ghế)/i.test(prev)) { desc=prev.replace(/[:：]\s*$/,'').trim(); break; }
+       }
+       if(desc) add([desc,qty,unit,total]);
+     }
+   }
+
+   // Explicit pipe-separated table row. Supports both:
+   // STT | description | unit | qty | unit price | amount
+   // description | unit | qty | unit price | amount
+   const p=line.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean);
+   if(p.length>=5){
+     let stt='',desc='',unitLabel='',qty=null,unit=null,total=null;
+     const numsAt=(idx)=>numericTokens(p[idx]||'');
+     // 6+ columns: find the last three numeric columns with a unit column before price.
+     if(p.length>=6){
+       const q=numsAt(p.length-3), u=numsAt(p.length-2), t=numsAt(p.length-1);
+       if(q.length&&u.length&&t.length&&unitLike(p[p.length-4])){
+         qty=q[0].value; unit=u.at(-1).value; total=t.at(-1).value;
+         desc=p.slice(0,p.length-4).filter(x=>!/^\d+[.)]?$/.test(x)).join(' | ');
+         add(desc?[desc,qty,unit,total]:null);
+       }
+     }
+     // 5 columns: description | unit | qty | price | amount
+     if(p.length===5){
+       const q=numsAt(2),u=numsAt(3),t=numsAt(4);
+       if(q.length&&u.length&&t.length&&unitLike(p[1])) add([p[0],q[0].value,u.at(-1).value,t.at(-1).value]);
+       // description | qty | unit | price | amount
+       const q2=numsAt(1),u2=numsAt(3),t2=numsAt(4);
+       if(q2.length&&u2.length&&t2.length&&unitLike(p[2])) add([p[0],q2[0].value,u2.at(-1).value,t2.at(-1).value]);
+     }
+   }
+
+ }
+ const splitRows=recoverSplitTableRows(lines);
+ for(const it of splitRows) add(it);
+ const fallback=extractValidatedRows(text);
+ for(const it of fallback) add(it);
+ return items.slice(0,200);
+}
+
+function parseVietnameseMoneyWords(s){
+ const t=stripVN(String(s||'').toLowerCase()).replace(/dong.*$/,'').trim();
+ if(!t)return null;
+ const digit={khong:0,mot:1,hai:2,ba:3,bon:4,tu:4,nam:5,lam:5,sau:6,bay:7,tam:8,chin:9};
+ const scale={nghin:1e3,ngan:1e3,trieu:1e6,ty:1e9};
+ const w=t.split(/\s+/).filter(Boolean);
+ let total=0,cur=0,seen=false;
+ for(let i=0;i<w.length;i++){
+   const x=w[i];
+   if(x==='tram'){cur=(cur||1)*100;seen=true;continue;}
+   if(x==='muoi'){
+     // "bốn mươi tám" => 4*10+8; do not multiply an already-built hundred.
+     const tens=cur%100;
+     if(tens>0 && tens<10) cur += tens*9;
+     else if(cur===0) cur=10;
+     seen=true;continue;
+   }
+   if(x==='linh'||x==='le')continue;
+   if(x in digit){cur+=digit[x];seen=true;continue;}
+   if(x in scale){total+=(cur||1)*scale[x];cur=0;seen=true;continue;}
+ }
+ const n=total+cur;
+ return seen&&n>=1000?n:null;
+}
+
+function extractQuotationSummaryRows(text){
+ const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+ let before=null,vat=null,after=null;
+ const moneyFrom=s=>{const ns=numericTokens(s).filter(x=>x.value>=1000&&x.value<1e13);return ns.length?ns.at(-1).value:null};
+ const cleanLabel=s=>stripVN(String(s||'').toLowerCase()).replace(/\|/g,' ').replace(/\s+/g,' ').trim();
+ for(let i=0;i<lines.length;i++){
+   const cur=cleanLabel(lines[i]); const curVal=moneyFrom(lines[i]); const nextVal=moneyFrom(lines[i+1]||'');
+   const isBefore=/(^|\s)(tong tam tinh|tong truoc vat|tong truoc thue|subtotal|cong truoc vat|cong truoc thue|tong hang muc)(\s|$)/.test(cur) || /^tong$|^cong$/.test(cur);
+   const isVat=/(^|\s)(thue vat|thue gtgt|vat|tien thue)(\s|$)/.test(cur);
+   const isAfter=/(^|\s)(tong cong sau thue|tong cong sau vat|tong sau thue|tong sau vat|tong thanh toan|thanh tien|grand total)(\s|$)/.test(cur);
+   if(isAfter && curVal!=null) after=curVal;
+   else if(isVat && curVal!=null) vat=curVal;
+   else if(isBefore && curVal!=null) before=curVal;
+   if(isAfter && curVal==null && nextVal!=null) after=nextVal;
+   else if(isVat && curVal==null && nextVal!=null) vat=nextVal;
+   else if(isBefore && curVal==null && nextVal!=null) before=nextVal;
+ }
+ return {before,vat,after};
+}
+
+// V49 safety bridge: keep the quality engine available even if a browser has
+// cached/partial script state. Never let one quality-check function prevent
+// the quote itself from being displayed.
+if(typeof window!=='undefined' && typeof window.buildDataQualityUniversal!=='function'){
+  window.buildDataQualityUniversal=function(args){
+    args=args||{}; const a=args.arithmetic||{};
+    const name=args.name, before=args.before, vat=args.vat, after=args.after, items=args.items||[];
+    const financialReady=!!name&&!isCustomerName(name)&&Number.isFinite(before)&&before>0&&Number.isFinite(after)&&after>0&&(vat==null||Number.isFinite(vat))&&a.totalMatches!==false;
+    const detailReady=items.length>0;
+    const blockers=[];
+    if(!name||isCustomerName(name)) blockers.push('Chưa xác định đúng NCC/Nhà thầu.');
+    if(!(Number.isFinite(before)&&before>0)) blockers.push('Chưa xác định Tổng trước VAT.');
+    if(!(Number.isFinite(after)&&after>0)) blockers.push('Chưa xác định Tổng sau VAT.');
+    if(a.vatMatches===false) blockers.push('VAT không khớp tỷ lệ được ghi.');
+    if(a.totalMatches===false) blockers.push('Trước VAT + VAT không khớp Sau VAT.');
+    if(!detailReady) blockers.push('Chưa nhận diện được bảng hạng mục chi tiết.');
+    if(a.itemsMatchTotal===false) blockers.push('Tổng hạng mục không khớp Tổng trước VAT.');
+    return {score:0,financialReady,detailReady,readyForComparison:financialReady,blockers,checks:[]};
+  };
+}
+
+
+function extractFinancialEvidenceUniversal(text){
+ const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+ const out={before:[],vat:[],after:[],rates:[]};
+ const moneyFrom=s=>{const ns=numericTokens(String(s||'')).filter(x=>x.value>=1000&&x.value<1e13);return ns.length?ns.at(-1).value:null};
+ const norm=s=>stripVN(String(s||'').toLowerCase()).replace(/\s+/g,' ').trim();
+ const push=(kind,val,line,score,reason)=>{if(val==null||!Number.isFinite(val)||val<=0)return;out[kind].push({value:val,line,score,reason});};
+ for(let i=0;i<lines.length;i++){
+   const raw=lines[i], n=norm(raw), val=moneyFrom(raw), next=moneyFrom(lines[i+1]||'');
+   const rateMatch=raw.match(/(?:vat|gtgt|thuế\s*(?:vat|gtgt)|thuế\s*giá\s*trị\s*gia\s*tăng)[^%\d]{0,35}(\d+(?:[.,]\d+)?)\s*%/i)
+     || raw.match(/(\d+(?:[.,]\d+)?)\s*%[^\n]{0,35}(?:vat|gtgt|thuế)/i);
+   if(rateMatch){const r=Number(String(rateMatch[1]).replace(',','.'));if(r>0&&r<100)out.rates.push(r);}
+
+   const before=/\b(tổng\s*tạm\s*tính|tổng\s*trước\s*vat|tổng\s*trước\s*thuế|subtotal|cộng\s*trước\s*vat|cộng\s*trước\s*thuế)\b/i.test(n)
+     || /^\s*(?:\d+[.)]?\s*\|\s*)?(?:cộng|tổng)\s*(?:\|.*)?$/i.test(raw);
+   const vat=/\b(?:thuế\s*(?:vat|gtgt)|tiền\s*thuế|vat)\b/i.test(n);
+   const after=/\b(tổng\s*cộng\s*sau\s*thuế|tổng\s*cộng\s*sau\s*vat|tổng\s*sau\s*thuế|tổng\s*sau\s*vat|tổng\s*thanh\s*toán|grand\s*total)\b/i.test(n)
+     || /^\s*(?:thành tiền|thanh tiền)\s*(?:\||:|$)/i.test(raw);
+
+   if(before){
+     if(val!=null)push('before',val,raw,120,'explicit-label');
+     else if(next!=null)push('before',next,lines[i+1],100,'label-next');
+   }
+   if(vat){
+     if(val!=null)push('vat',val,raw,120,'explicit-label');
+     else if(next!=null)push('vat',next,lines[i+1],100,'label-next');
+   }
+   if(after){
+     if(val!=null)push('after',val,raw,120,'explicit-label');
+     else if(next!=null)push('after',next,lines[i+1],100,'label-next');
+   }
+ }
+ // Dedicated table-column patterns. These are intentionally strict so a phone number,
+ // quantity, or unit price cannot become a total by accident.
+ for(const line of lines){
+   const n=norm(line);
+   let m=line.match(/(?:tổng\s*tạm\s*tính|cộng\s*trước\s*vat|cộng)\s*\|?\s*(\d[\d.,\s]{2,})$/i);
+   if(m)push('before',normalizeMoney(m[1]),line,140,'table-row');
+   m=line.match(/(?:thuế\s*(?:vat|gtgt)|vat)\s*(?:\(?\s*(\d+(?:[.,]\d+)?)\s*%\s*\)?\s*)?\|?\s*(\d[\d.,\s]{2,})$/i);
+   if(m){ if(m[1]){const r=Number(String(m[1]).replace(',','.'));if(r>0&&r<100)out.rates.push(r);} push('vat',normalizeMoney(m[2]),line,140,'table-row'); }
+   m=line.match(/(?:tổng\s*cộng\s*sau\s*thuế|tổng\s*cộng\s*sau\s*vat|tổng\s*sau\s*thuế|tổng\s*thanh\s*toán|thành\s*tiền)\s*\|?\s*(\d[\d.,\s]{2,})$/i);
+   if(m)push('after',normalizeMoney(m[1]),line,140,'table-row');
+ }
+ out.rates=[...new Set(out.rates.filter(r=>r>0&&r<100))];
+ return out;
+}
+function resolveFinancialUniversal(primary,secondary,itemSum,amountWordsValue){
+ const sources=[{text:String(primary||''),tag:'native',base:0},{text:String(secondary||''),tag:'ocr',base:-15}].filter(x=>x.text.trim());
+ const candidates=[];
+ for(const src of sources){
+   const ev=extractFinancialEvidenceUniversal(src.text);
+   if(src.tag==='native' && amountWordsValue>0) ev.after.push({value:amountWordsValue,line:'Bằng chữ',score:150,reason:'amount-in-words'});
+   const beforeVals=[...ev.before], vatVals=[...ev.vat], afterVals=[...ev.after];
+   const rates=ev.rates.length?ev.rates:[null];
+   for(const b0 of (beforeVals.length?beforeVals:[null])) for(const v0 of (vatVals.length?vatVals:[null])) for(const a0 of (afterVals.length?afterVals:[null])) for(const rate of rates){
+     let b=b0?.value??null,v=v0?.value??null,a=a0?.value??null;
+     let derivedB=false,derivedV=false,derivedA=false;
+     if(b==null&&a!=null&&v!=null){b=a-v;derivedB=true;}
+     if(v==null&&b!=null&&a!=null){v=a-b;derivedV=true;}
+     if(a==null&&b!=null&&v!=null){a=b+v;derivedA=true;}
+     if(v==null&&b!=null&&rate!=null){v=Math.round(b*rate/100);derivedV=true;}
+     if(a==null&&b!=null&&v!=null){a=b+v;derivedA=true;}
+     if(b==null&&a!=null&&rate!=null){b=Math.round(a/(1+rate/100));derivedB=true; if(v==null){v=a-b;derivedV=true;}}
+     if(b==null&&itemSum>0&&a!=null){b=itemSum;derivedB=true; if(v==null){v=a-b;derivedV=true;}}
+     if(b==null&&itemSum>0&&rate!=null&&a==null){b=itemSum;derivedB=true;v=Math.round(b*rate/100);derivedV=true;a=b+v;derivedA=true;}
+     if(v==null&&b!=null&&rate!=null){v=Math.round(b*rate/100);derivedV=true;}
+     if(a==null&&b!=null&&v!=null){a=b+v;derivedA=true;}
+     if(!(b>0)||!(a>0))continue;
+     const tol=Math.max(1000,Math.abs(a)*0.005);
+     const totalOk=v==null?null:Math.abs(b+v-a)<=tol;
+     const vatOk=(rate==null||v==null)?null:Math.abs(v-b*rate/100)<=Math.max(1000,Math.abs(v)*0.01);
+     const itemOk=itemSum>0?Math.abs(itemSum-b)<=Math.max(1000,itemSum*.005):null;
+     let score=src.base;
+     score+=(b0?b0.score:0)+(v0?v0.score:0)+(a0?a0.score:0)+(rate!=null?25:0);
+     if(totalOk===true)score+=180; else if(totalOk===false)score-=220;
+     if(vatOk===true)score+=80; else if(vatOk===false)score-=120;
+     if(itemOk===true)score+=80; else if(itemOk===false)score-=80;
+     score-=derivedB?5:0; score-=derivedV?5:0; score-=derivedA?5:0;
+     candidates.push({before:b,vat:v,after:a,vatRate:rate,totalMatches:totalOk,vatMatches:vatOk,itemsMatchTotal:itemOk,score,evidence:{before:b0?.reason||'derived',vat:v0?.reason||'derived',after:a0?.reason||'derived',source:src.tag}});
+   }
+ }
+ if(!candidates.length)return {before:null,vat:null,after:null,vatRate:null,totalMatches:null,vatMatches:null,itemsMatchTotal:null,evidence:null};
+ candidates.sort((x,y)=>y.score-x.score);
+ const best=candidates[0];
+ return best;
+}
+
+
+/* V55 — UNIVERSAL FINANCIAL SMART READER
+   Purpose: read quotation totals semantically and reconcile:
+   BEFORE VAT + VAT = AFTER VAT.
+   It never uses an isolated OCR number as a financial total when a labeled
+   subtotal/tax/final-total set or a validated item subtotal is available.
+*/
+function v53FinancialRows(text){
+  const lines=String(text||'').replace(/\u00a0/g,' ').split(/\n+/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+  const norm=s=>stripVN(String(s||'').toLowerCase()).replace(/\s+/g,' ').trim();
+  const money=s=>{const ns=numericTokens(String(s||'')).filter(x=>x.value>=1000&&x.value<1e13);return ns.length?ns.at(-1).value:null};
+  const out={before:[],vat:[],after:[],rate:[],evidence:[]};
+  const push=(kind,val,line,score,reason)=>{if(Number.isFinite(val)&&val>0){out[kind].push({value:val,line,score,reason});out.evidence.push({kind,value:val,line,score,reason});}};
+  const classify=s=>{
+    const x=norm(s);
+    // IMPORTANT: "Tổng" by itself is a subtotal only when it appears in the financial/table area.
+    const before=/\b(?:tong\s*(?:tien\s*)?(?:tam\s*tinh|truoc\s*vat|truoc\s*thue)|tong\s*hang\s*muc|cong\s*(?:truoc\s*vat|truoc\s*thue)|subtotal)\b/.test(x) || /^(?:tong|cong)$/.test(x);
+    const vat=/\b(?:thue\s*(?:vat|gtgt)|tien\s*thue)\b/.test(x) || /^(?:vat|gtgt)$/.test(x);
+    const after=/\b(?:tong\s*(?:cong\s*)?(?:sau\s*vat|sau\s*thue|thanh\s*toan|phai\s*tra)|tong\s*cong\s*sau\s*(?:vat|thue))\b/.test(x) || /^thanh\s*tien$/.test(x) || /^thanh\s*toan$/.test(x) || /\bgrand\s*total\b/.test(x);
+    return {before,vat,after};
+  };
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i], cls=classify(line), val=money(line);
+    // Label and amount in the same row.
+    if(cls.before && val!=null) push('before',val,line,220,'labeled-row');
+    if(cls.vat && val!=null) push('vat',val,line,220,'labeled-row');
+    if(cls.after && val!=null) push('after',val,line,230,'labeled-row');
+    // Pipe-separated table row: label | amount (or label | ... | amount).
+    const parts=line.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean);
+    if(parts.length>=2){
+      for(let j=0;j<parts.length;j++){
+        const c=classify(parts[j]); if(!c.before&&!c.vat&&!c.after) continue;
+        for(let z=j+1;z<parts.length;z++){
+          const mv=money(parts[z]); if(mv==null) continue;
+          if(c.before) push('before',mv,line,260,'pipe-row');
+          if(c.vat) push('vat',mv,line,260,'pipe-row');
+          if(c.after) push('after',mv,line,270,'pipe-row');
+        }
+      }
+    }
+    // Label-only line: search only the next 2 lines, and stop at another financial label.
+    if(cls.before||cls.vat||cls.after){
+      for(let j=i+1;j<=Math.min(i+2,lines.length-1);j++){
+        const nx=lines[j]; const nc=classify(nx); if(nc.before||nc.vat||nc.after) break;
+        const mv=money(nx); if(mv==null) continue;
+        if(cls.before) push('before',mv,nx,180,'label-next-line');
+        if(cls.vat) push('vat',mv,nx,180,'label-next-line');
+        if(cls.after) push('after',mv,nx,190,'label-next-line');
+        break;
+      }
+    }
+    const rm=line.match(/(?:vat|gtgt|thu[eế]\s*(?:vat|gtgt)|thu[eế]\s*gi[aá]\s*tr[iị]\s*gia\s*t[aă]ng)[^%\d]{0,30}(\d+(?:[.,]\d+)?)\s*%/i);
+    if(rm){const r=Number(String(rm[1]).replace(',','.'));if(r>0&&r<100)out.rate.push(r)}
+    const rm2=line.match(/(\d+(?:[.,]\d+)?)\s*%[^\n]{0,30}(?:vat|gtgt|thu[eế])/i);
+    if(rm2){const r=Number(String(rm2[1]).replace(',','.'));if(r>0&&r<100)out.rate.push(r)}
+  }
+  // Amount in words is strong evidence for the final amount.
+  const bw=findAmountInWords(String(text||''));
+  if(bw){const w=parseVietnameseMoneyWords(bw);if(w!=null)push('after',w,bw,280,'amount-in-words');}
+  return out;
+}
+function v53Best(arr){return arr?.length?[...arr].sort((a,b)=>b.score-a.score)[0]:null}
+function v53ResolveFinancial(text,items){
+  // V55: source-first financial reconciliation. Never let an isolated number
+  // become a total. Priority: validated item subtotal + explicit financial
+  // labels + amount-in-words + arithmetic triangle.
+  const ev=v53FinancialRows(text);
+  const itemRows=(items||[]).filter(i=>Array.isArray(i)&&Number(i[1])>0&&Number(i[2])>0&&Number(i[3])>0);
+  const itemSum=itemRows.reduce((s,i)=>s+(Number(i[3])||0),0);
+  const tol=x=>Math.max(1000,Math.abs(x||0)*0.005);
+  const b0=v53Best(ev.before), v0=v53Best(ev.vat), a0=v53Best(ev.after);
+  let b=b0?.value??null, v=v0?.value??null, a=a0?.value??null;
+  let rate=ev.rate.length?ev.rate.sort((x,y)=>y-x)[0]:null;
+
+  // Detect amount-in-words only as a corroborating final-total source.
+  const words=findAmountInWords(text);
+  const wordsValue=parseVietnameseMoneyWords(words);
+  if(wordsValue>0) a=wordsValue;
+
+  // A validated table subtotal is stronger than a generic 'Tổng' candidate
+  // that may have been produced from an OCR column fragment.
+  if(itemSum>0){
+    if(b==null || Math.abs(b-itemSum)>tol(itemSum)) b=itemSum;
+  }
+
+  // Complete missing sides from explicit values / VAT rate.
+  if(v==null && b!=null && a!=null && a>=b) v=a-b;
+  if(a==null && b!=null && v!=null) a=b+v;
+  if(b==null && a!=null && v!=null && a>=v) b=a-v;
+  if(v==null && b!=null && rate!=null) v=Math.round(b*rate/100);
+  if(a==null && b!=null && v!=null) a=b+v;
+  if(b==null && a!=null && rate!=null){
+    b=Math.round(a/(1+rate/100));
+    v=a-b;
+  }
+
+  // If a final total and a validated item subtotal exist, the difference is
+  // the tax amount. This is deliberately independent of any OCR VAT number.
+  if(itemSum>0 && a!=null && a>=itemSum){
+    const impliedVat=a-itemSum;
+    const impliedRate=itemSum?impliedVat/itemSum*100:null;
+    if(impliedVat>=0 && impliedVat<=a*0.30){
+      b=itemSum;
+      if(v==null || Math.abs(v-impliedVat)>tol(impliedVat)) v=impliedVat;
+      if(rate==null && impliedRate>=0 && impliedRate<=30) rate=Math.round(impliedRate*100)/100;
+    }
+  }
+
+  // Final deterministic triangle. Existing source values are not overwritten
+  // unless they are demonstrably inconsistent with validated item rows.
+  if(b!=null && v!=null) a=b+v;
+  if(itemSum>0) b=itemSum;
+  if(b!=null && rate!=null) {
+    const expected=Math.round(b*rate/100);
+    if(v==null || Math.abs(v-expected)>tol(expected)) v=expected;
+    a=b+v;
+  }
+
+  const totalMatches=(b!=null&&v!=null&&a!=null)?Math.abs(b+v-a)<=tol(a):null;
+  const vatMatches=(b!=null&&v!=null&&rate!=null)?Math.abs(v-b*rate/100)<=Math.max(1000,Math.abs(v)*.01):null;
+  const itemsMatchTotal=itemSum>0&&b!=null?Math.abs(itemSum-b)<=tol(itemSum):null;
+  return {
+    before:b,vat:v,after:a,vatRate:rate,totalMatches,vatMatches,itemsMatchTotal,itemSum,
+    evidence:{before:b0,vat:v0,after:a0,rates:ev.rate,rows:ev.evidence,amountWords:wordsValue||null,
+      rule:'V55 SOURCE-FIRST: validated item subtotal + explicit financial labels + amount-in-words + arithmetic triangle'}
+  };
+}
+
+/* V55 — SMART FINANCIAL TABLE RECONCILIATION
+   Handles quotation tables where the PDF text extraction separates labels,
+   percentages and amounts across different lines/columns.
+   Key rule: an explicit final total + an explicit VAT rate can recover the
+   pre-VAT subtotal; an explicit subtotal + VAT amount recovers final total.
+   Source values are preserved when all three are explicitly present. */
+function v54SmartFinancial(text, existingItems){
+  const lines=String(text||'').replace(/\u00a0/g,' ').split(/\n+/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+  const norm=s=>stripVN(String(s||'').toLowerCase()).replace(/\s+/g,' ').trim();
+  const moneyVals=s=>numericTokens(String(s||'')).filter(x=>x.value>=1000&&x.value<1e13);
+  const nearestAmount=(i, max=4)=>{
+    for(let d=0;d<=max;d++){
+      for(const j of [i+d,i-d]){
+        if(j<0||j>=lines.length) continue;
+        const vals=moneyVals(lines[j]);
+        if(vals.length) return {value:vals.at(-1).value,line:lines[j],distance:d};
+      }
+    }
+    return null;
+  };
+  const rows={before:[],vat:[],after:[],rates:[]};
+  const push=(k,x,score,reason)=>{if(x&&x.value>0)rows[k].push({...x,score,reason});};
+  for(let i=0;i<lines.length;i++){
+    const raw=lines[i], n=norm(raw);
+    const vals=moneyVals(raw);
+    const before=/\b(tong\s*(?:tien\s*)?(?:tam\s*tinh|truoc\s*vat|truoc\s*thue)|tong\s*hang\s*muc|cong\s*(?:truoc\s*vat|truoc\s*thue)|subtotal)\b/.test(n) || /^tong$|^cong$/.test(n);
+    const vat=/\b(thue\s*(?:vat|gtgt)|tien\s*thue|vat|gtgt)\b/.test(n);
+    const after=/\b(tong\s*(?:cong\s*)?(?:sau\s*vat|sau\s*thue|thanh\s*toan|phai\s*tra)|tong\s*cong\s*sau\s*(?:vat|thue)|grand\s*total)\b/.test(n) || /^thanh\s*tien$|^thanh\s*toan$/.test(n);
+    if(before && vals.length) push('before',{value:vals.at(-1).value,line:raw},320,'explicit-summary-row');
+    if(vat && vals.length){
+      // If this row has both a % and a money amount, the money is the VAT amount.
+      push('vat',{value:vals.at(-1).value,line:raw},320,'explicit-vat-row');
+    }
+    if(after && vals.length) push('after',{value:vals.at(-1).value,line:raw},330,'explicit-final-row');
+    // Extract VAT percentage from the same row or a nearby row.
+    const rm=raw.match(/(?:vat|gtgt|thu[eế]\s*(?:vat|gtgt)|thu[eế]\s*gi[aá]\s*tr[iị]\s*gia\s*t[aă]ng)[^%\d]{0,45}(\d+(?:[.,]\d+)?)\s*%/i)
+      || raw.match(/(\d+(?:[.,]\d+)?)\s*%[^\n]{0,45}(?:vat|gtgt|thu[eế])/i);
+    if(rm){const r=Number(String(rm[1]).replace(',','.'));if(r>0&&r<100)rows.rates.push(r);}
+    // Label-only rows: search a few lines forward, but do not let a quantity/unit price
+    // become a financial total when another financial label is encountered first.
+    if(before||vat||after){
+      for(let j=i+1;j<=Math.min(i+4,lines.length-1);j++){
+        const nx=norm(lines[j]);
+        if(/\b(tong\s*(?:tien\s*)?(?:tam\s*tinh|truoc\s*vat|truoc\s*thue)|thue\s*(?:vat|gtgt)|tien\s*thue|tong\s*(?:cong\s*)?(?:sau\s*vat|sau\s*thue)|thanh\s*tien)\b/.test(nx) && !/^tong$|^cong$|^vat$/.test(nx)) break;
+        const vs=moneyVals(lines[j]);
+        if(vs.length){
+          const x={value:vs.at(-1).value,line:lines[j]};
+          if(before) push('before',x,250,'label-following-row');
+          if(vat) push('vat',x,250,'label-following-row');
+          if(after) push('after',x,260,'label-following-row');
+          break;
+        }
+      }
+    }
+  }
+  // A standalone “Bằng chữ” amount is strong evidence for the final payable amount.
+  const words=findAmountInWords(String(text||''));
+  const wordValue=parseVietnameseMoneyWords(words);
+  if(wordValue) push('after',{value:wordValue,line:words},360,'amount-in-words');
+
+  const best=(a)=>a.length?[...a].sort((x,y)=>y.score-x.score)[0]:null;
+  let b=best(rows.before)?.value??null;
+  let v=best(rows.vat)?.value??null;
+  let a=best(rows.after)?.value??null;
+  const rate=rows.rates.length?[...rows.rates].sort((x,y)=>y-x)[0]:null;
+  const itemSum=(existingItems||[]).reduce((s,it)=>s+(Number(it[3])||0),0);
+  const tol=x=>Math.max(1000,Math.abs(x||0)*0.005);
+
+  // CRITICAL: if final amount and VAT rate are explicit, recover the subtotal.
+  // Example: 8,748,000 / 1.08 = 8,100,000.
+  if(a!=null && rate!=null && rate>0 && rate<100){
+    const derivedBefore=Math.round(a/(1+rate/100));
+    const derivedVat=a-derivedBefore;
+    const explicitBeforeOK=b!=null && Math.abs(b-derivedBefore)<=tol(derivedBefore);
+    const explicitVatOK=v!=null && Math.abs(v-derivedVat)<=tol(derivedVat);
+    if(b==null || !explicitBeforeOK){ b=derivedBefore; }
+    if(v==null || !explicitVatOK){ v=derivedVat; }
+  }
+  // If the table itself provides a validated item subtotal and a final total,
+  // use the item subtotal only when it produces a plausible VAT rate.
+  if(a!=null && itemSum>0 && (b==null || Math.abs(b-itemSum)>tol(itemSum))){
+    const implied=a-itemSum, impliedRate=implied/itemSum*100;
+    if(implied>0 && implied<=a*.30 && impliedRate>0 && impliedRate<=30){
+      b=itemSum;
+      if(v==null || Math.abs(v-implied)>tol(implied)) v=implied;
+    }
+  }
+  if(b!=null && v==null && a!=null) v=a-b;
+  if(b!=null && a==null && v!=null) a=b+v;
+  if(a!=null && b==null && v!=null) b=a-v;
+  if(b!=null && rate!=null && v==null) v=Math.round(b*rate/100);
+  if(b!=null && v!=null && a==null) a=b+v;
+  const totalMatches=(b!=null&&v!=null&&a!=null)?Math.abs(b+v-a)<=tol(a):null;
+  const vatMatches=(b!=null&&v!=null&&rate!=null)?Math.abs(v-b*rate/100)<=Math.max(1000,Math.abs(v)*.01):null;
+  const itemsMatch=itemSum>0&&b!=null?Math.abs(itemSum-b)<=tol(itemSum):null;
+  return {before:b,vat:v,after:a,vatRate:rate,totalMatches,vatMatches,itemsMatchTotal:itemsMatch,itemSum,evidence:{before:best(rows.before),vat:best(rows.vat),after:best(rows.after),rates:rows.rates,amountInWords:wordValue}};
+}
+
+function parseQuote(text,filename,caseObj){
+ const clean=String(text||'').replace(/\u00a0/g,' ').replace(/\r/g,'').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n').trim();
+ const marker='--- OCR TRANG';
+ const primary=(clean.split(marker)[0]||'').trim();
+ const secondary=clean.includes(marker)?clean.slice(clean.indexOf(marker)).trim():'';
+ const sourcePrimary=primary||clean;
+ const name=findSupplier(sourcePrimary||clean,filename)||supplierFromFilename(filename);
+ // IMPORTANT: never choose only native OR OCR for a quote. A scanned PDF may have
+ // no native text while a DOCX/PDF may contain the financial table in native text.
+ // Parse the complete source pool, then de-duplicate validated line items.
+ const items=parseItemsUniversal(clean,caseObj?.template||'custom');
+ const financial=resolveQuoteFinancialV57(clean,sourcePrimary,secondary,items);
+ let before=financial.before, vat=financial.vat, after=financial.after, vatRate=financial.vatRate;
+ const arithmetic={itemsTotal:financial.itemSum,itemsMatchTotal:financial.itemsMatchTotal,vatMatches:financial.vatMatches,totalMatches:financial.totalMatches,v53Evidence:financial.evidence};
+ const quoteDate=findDateUniversal(clean);
+ const time=findContextUniversal(clean,['thời gian thực hiện','thời gian cung cấp','thời gian giao hàng','tiến độ thực hiện','tiến độ','thực hiện trong','giao hàng trong','thời gian hoàn thành','thời gian vệ sinh','thời gian dự kiến','thời gian thi công']);
+ const warranty=cleanWarranty(findContextUniversal(clean,['bảo hành','thời hạn bảo hành','warranty']));
+ const payment=findContextUniversal(clean,['điều kiện thanh toán','phương thức thanh toán','thanh toán','payment']);
+ const validity=findContextUniversal(clean,['hiệu lực báo giá','thời hạn báo giá','báo giá có hiệu lực','validity']);
+ const location=findContextUniversal(clean,['địa điểm thực hiện','địa điểm giao hàng','địa chỉ thực hiện','địa chỉ thi công','tại kho khách hàng','tại kho','địa điểm']);
+ const amountWords=findAmountInWords(sourcePrimary)||findAmountInWords(secondary);
+ const notes=[];
+ if(name)notes.push('NCC/Nhà thầu: '+name+'.');
+ if(isCustomerName(name))notes.push('⚠ GONSA là khách hàng; không dùng GONSA làm NCC.');
+ if(items.length)notes.push('Đã xác nhận '+items.length+' hạng mục bằng phép tính Số lượng × Đơn giá = Thành tiền.');
+ else notes.push('⚠ Chưa xác nhận được hạng mục chi tiết từ nguồn đọc.');
+ if(financial.itemSum>0)notes.push('Tổng hạng mục: '+fmt(financial.itemSum)+'.');
+ if(before!=null)notes.push('Trước VAT: '+fmt(before)+'.');
+ if(vat!=null)notes.push('VAT: '+fmt(vat)+(vatRate!=null?' ('+vatRate+'%).':'.'));
+ if(after!=null)notes.push('Sau VAT: '+fmt(after)+'.');
+ if(arithmetic.totalMatches===false)notes.push('⚠ Trước VAT + VAT không khớp Sau VAT — không tự sửa số nguồn.');
+ if(arithmetic.itemsMatchTotal===false)notes.push('⚠ Tổng hạng mục không khớp Trước VAT — cần kiểm tra nguồn.');
+ let quality;
+ try{quality=buildDataQualityUniversal({name,before,vat,after,items,arithmetic,quoteDate,time,warranty,payment,validity,location});}
+ catch(e){quality={score:0,financialReady:false,detailReady:items.length>0,readyForComparison:false,blockers:[e?.message||String(e)],checks:[]};}
+ return {name,beforeVat:before,vat,total:after,time:time||'Không thấy nêu rõ',warranty:warranty||'Không thấy nêu rõ',payment:payment||'Không thấy nêu rõ',validity:validity||'Không thấy nêu rõ',location:location||'Không thấy nêu rõ',quoteDate,vatRate,items,notes,rawText:clean.slice(0,200000),confidence:{supplier:name&&!isCustomerName(name)?.98:.2,total:quality.financialReady?.99:(before!=null||after!=null)?.8:.1,items:items.length?.98:.15},arithmetic,totalCandidates:{before:[before].filter(x=>x!=null),vat:[vat].filter(x=>x!=null),after:[after].filter(x=>x!=null)},quality};
+}
+
+function buildDataQualityUniversal({name,before,vat,after,items,arithmetic,quoteDate,time,warranty,payment,validity,location}){
+ const financialReady=!!name&&!isCustomerName(name)&&Number.isFinite(before)&&before>0&&Number.isFinite(after)&&after>0&&(vat==null||Number.isFinite(vat))&&arithmetic?.totalMatches!==false;
+ const detailReady=Array.isArray(items)&&items.length>0;
+ const checks=[
+  {label:'NCC/Nhà thầu',ok:!!name&&!isCustomerName(name),weight:15},
+  {label:'Tổng trước VAT',ok:Number.isFinite(before)&&before>0,weight:20},
+  {label:'VAT',ok:vat==null||Number.isFinite(vat)&&vat>=0,weight:10},
+  {label:'Tổng sau VAT',ok:Number.isFinite(after)&&after>0,weight:20},
+  {label:'Hạng mục chi tiết',ok:detailReady,weight:15},
+  {label:'Đối chiếu tổng tiền',ok:arithmetic?.totalMatches===true,weight:10},
+  {label:'Đối chiếu hạng mục',ok:arithmetic?.itemsMatchTotal===true,weight:5},
+  {label:'Điều kiện báo giá',ok:[time,warranty,payment,validity,location].some(v=>v&&v!=='Không thấy nêu rõ'),weight:3},
+  {label:'Ngày báo giá',ok:!!quoteDate,weight:2}
+ ];
+ const score=checks.reduce((s,x)=>s+(x.ok?x.weight:0),0); const blockers=[];
+ if(!name||isCustomerName(name))blockers.push('Chưa xác định đúng NCC/Nhà thầu.');
+ if(!(Number.isFinite(before)&&before>0))blockers.push('Chưa xác định Tổng trước VAT.');
+ if(!(Number.isFinite(after)&&after>0))blockers.push('Chưa xác định Tổng sau VAT.');
+ if(arithmetic?.vatMatches===false)blockers.push('VAT không khớp tỷ lệ được ghi.');
+ if(arithmetic?.totalMatches===false)blockers.push('Trước VAT + VAT không khớp Sau VAT.');
+ if(!detailReady)blockers.push('Chưa nhận diện được bảng hạng mục chi tiết.');
+ if(arithmetic?.itemsMatchTotal===false)blockers.push('Tổng hạng mục không khớp Tổng trước VAT.');
+ return {score,financialReady,detailReady,readyForComparison:financialReady,blockers,checks};
+}
+
+function parseItemsUniversal(text,template){
+ const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+ const out=[]; const seen=new Set();
+ const units=/^(m2|m²|m3|m³|m|cái|cai|bộ|bo|kg|gói|goi|chai|thùng|thung|chiếc|chiec|ngày|ngay|giờ|gio|ống|ong|set|lot|phần|phan|lần|lan|suất|suat)$/i;
+ const add=(desc,qty,unit,total,source)=>{
+   if(!desc||!(qty>0&&qty<=100000&&unit>0&&total>0))return false;
+   if(Math.abs(qty*unit-total)>Math.max(1500,total*.025))return false;
+   desc=String(desc).replace(/^\s*\d+[.)-]?\s*/,'').replace(/\s+(?:m2|m²|m3|m³|cái|cai|bộ|bo|kg|gói|goi|chai|thùng|thung|chiếc|chiec|ngày|ngay|giờ|gio|ống|ong|set|lot|phần|phan|lần|lan|suất|suat)\s*$/i,'').replace(/\s+/g,' ').trim();
+   const key=normalizeItemName(desc); if(key.length<3||seen.has(key))return false;
+   seen.add(key); out.push([desc,qty,unit,total,source||'']); return true;
+ };
+ const isSummary=s=>{const n=stripVN(s).toLowerCase();return /^(?:\d+[.)-]?\s*)?(?:tong|cong|thue|vat|gtgt|thanh tien|thanh toan|grand total|subtotal)\b/.test(n);};
+ const moneyNums=line=>numericTokens(line).filter(x=>x.value>=100&&x.value<1e13);
+ for(let i=0;i<lines.length;i++){
+   const line=lines[i]; if(isSummary(line)||/\b(?:stt|nội dung|noi dung|đvt|dvt|đơn vị|don vi|số lượng|so luong|đơn giá|don gia|thành tiền|thanh tien)\b/i.test(line)) continue;
+   // Pipe/native table rows: description | unit | qty | unit price | total.
+   const p=line.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean);
+   if(p.length>=4){
+     for(let k=0;k<p.length-3;k++){
+       const q=moneyNums(p[k+1]).find(x=>x.value>0&&x.value<=100000);
+       const u=moneyNums(p[k+2]).at(-1), t=moneyNums(p[k+3]).at(-1);
+       if(q&&u&&t && add(p.slice(0,k+1).filter(x=>!/^\d+[.)-]?$/.test(x)).join(' '),q.value,u.value,t.value,'pipe')) break;
+     }
+   }
+   const nums=moneyNums(line);
+   if(nums.length>=3){
+     // Search the last numeric triples for qty × unit price = amount.
+     for(let a=Math.max(0,nums.length-5);a<nums.length-2;a++){
+       for(let b=a+1;b<nums.length-1;b++){
+         for(let c=b+1;c<nums.length;c++){
+           const q=nums[a].value,u=nums[b].value,t=nums[c].value;
+           if(q>100000||u<=0||t<=0)continue;
+           if(Math.abs(q*u-t)<=Math.max(1500,t*.025)){
+             let desc=line.slice(0,nums[a].index).replace(/^\s*\d+[.)-]?\s*/,'').trim();
+             if(desc.length>=3){
+               add(desc,q,u,t,'numeric-triple');
+               a=nums.length;break;
+             }
+           }
+         }
+         if(a===nums.length)break;
+       }
+       if(a===nums.length)break;
+     }
+   }
+   // Split OCR/native rows: description / qty unit / unit price / total.
+   const qm=(lines[i+1]||'').match(/^(\d+(?:[.,]\d+)?)\s*([A-Za-zÀ-ỹ²³]+)$/);
+   if(qm && units.test(qm[2])){
+     const u=moneyNums(lines[i+2]||'').at(-1), t=moneyNums(lines[i+3]||'').at(-1);
+     if(u&&t)add(line,normalizeMoney(qm[1]),u.value,t.value,'split');
+   }
+ }
+ return out.map(x=>x.slice(0,4)).slice(0,500);
+}
+
+function resolveQuoteFinancialV57(allText,primary,secondary,items){
+ // V58 TABLE READER / FINANCIAL LOCK
+ // Core principle:
+ // - Never let a partial OCR item list overwrite an explicit financial subtotal.
+ // - Prefer an explicit summary row, amount-in-words, and arithmetic reconciliation.
+ // - A validated item subtotal may confirm/recover PRE-VAT only when it is complete
+ //   or when it reconciles with the final total.
+ const itemRows=(items||[]).filter(i=>Array.isArray(i)&&Number(i[1])>0&&Number(i[2])>0&&Number(i[3])>0);
+ const itemSum=itemRows.reduce((s,i)=>s+(Number(i[3])||0),0);
+ const itemCount=itemRows.length;
+
+ const texts=[];
+ for(const [text,tag,score] of [[primary,'native',80],[secondary,'ocr',60],[allText,'combined',20]]){
+   const t=String(text||'').trim();
+   if(t && !texts.some(x=>x.text===t)) texts.push({text:t,tag,score});
+ }
+
+ const norm=s=>stripVN(String(s||'').toLowerCase()).replace(/\s+/g,' ').trim();
+ const money=s=>{
+   const a=numericTokens(String(s||'')).filter(x=>x.value>=1000&&x.value<1e13);
+   return a.length?a[a.length-1].value:null;
+ };
+ const rows={before:[],vat:[],after:[],rates:[]};
+ const push=(k,value,line,score,reason,source)=>{
+   if(Number.isFinite(value)&&value>0) rows[k].push({value,line,score,reason,source});
+ };
+
+ const addText=(text,source,base)=>{
+   const lines=String(text||'').replace(/\u00a0/g,' ').split(/\n+/)
+     .map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+
+   for(let i=0;i<lines.length;i++){
+     const line=lines[i], n=norm(line), val=money(line);
+
+     const rateM=line.match(/(?:vat|gtgt|thu[eế]\s*(?:vat|gtgt)|thu[eế]\s*gi[aá]\s*tr[iị]\s*gia\s*t[aă]ng)[^%\d]{0,45}(\d+(?:[.,]\d+)?)\s*%/i)
+       || line.match(/(\d+(?:[.,]\d+)?)\s*%[^\n]{0,45}(?:vat|gtgt|thu[eế])/i);
+     if(rateM){
+       const r=Number(String(rateM[1]).replace(',','.'));
+       if(r>0&&r<100)rows.rates.push({value:r,source,score:180+base,line});
+     }
+
+     // Explicit financial rows.
+     const isBefore=
+       /\b(?:tong\s*(?:tien\s*)?(?:tam\s*tinh|truoc\s*vat|truoc\s*thue)|cong\s*(?:truoc\s*vat|truoc\s*thue)|subtotal)\b/i.test(n)
+       || /^(?:tong|cong)\b/i.test(n);
+
+     const isVat=
+       /\b(?:thue\s*(?:vat|gtgt)|tien\s*thue|vat|gtgt)\b/i.test(n);
+
+     const isAfter=
+       /\b(?:tong\s*(?:cong\s*)?(?:sau\s*vat|sau\s*thue|thanh\s*toan|phai\s*tra)|tong\s*cong\s*sau\s*(?:vat|thue)|grand\s*total)\b/i.test(n)
+       || /^(?:thanh\s*tien|thanh\s*toan)\b/i.test(n);
+
+     if(val!=null){
+       if(isAfter) push('after',val,line,330+base,'explicit-final-row',source);
+       else if(isVat) push('vat',val,line,320+base,'explicit-vat-row',source);
+       else if(isBefore) push('before',val,line,330+base,'explicit-before-row',source);
+     }
+
+     // Pipe-separated table summaries: label | amount.
+     const parts=line.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean);
+     if(parts.length>=2){
+       for(let j=0;j<parts.length-1;j++){
+         const label=norm(parts[j]);
+         const mv=money(parts[j+1]);
+         if(mv==null)continue;
+         if(/^(?:tong|cong)\b/.test(label) && !/vat|thue/.test(label))
+           push('before',mv,line,370+base,'pipe-before',source);
+         if(/(?:thue\s*(?:vat|gtgt)|tien\s*thue|^vat$|^gtgt$)/.test(label))
+           push('vat',mv,line,370+base,'pipe-vat',source);
+         if(/(?:thanh\s*tien|thanh\s*toan|tong\s*cong\s*sau|tong\s*sau|grand\s*total)/.test(label))
+           push('after',mv,line,380+base,'pipe-after',source);
+       }
+     }
+
+     // Label-only row followed by a numeric row.
+     if(isBefore||isVat||isAfter){
+       for(let j=i+1;j<=Math.min(i+3,lines.length-1);j++){
+         const nx=norm(lines[j]);
+         if(/\b(?:tong|cong|vat|gtgt|thue|thanh\s*tien|thanh\s*toan)\b/.test(nx) && !/^\d/.test(nx)) break;
+         const nv=money(lines[j]);
+         if(nv!=null){
+           if(isBefore)push('before',nv,lines[j],270+base,'label-next',source);
+           if(isVat)push('vat',nv,lines[j],265+base,'label-next',source);
+           if(isAfter)push('after',nv,lines[j],275+base,'label-next',source);
+           break;
+         }
+       }
+     }
+   }
+
+   // Amount-in-words is very strong evidence for the FINAL amount.
+   const words=findAmountInWords(text);
+   const wordValue=parseVietnameseMoneyWords(words);
+   if(wordValue>0)push('after',wordValue,words,520+base,'amount-in-words',source);
+ };
+
+ texts.forEach(x=>addText(x.text,x.tag,x.score));
+
+ const best=arr=>arr.length?[...arr].sort((a,b)=>b.score-a.score)[0]:null;
+ const close=(x,y)=>x!=null&&y!=null&&Math.abs(x-y)<=Math.max(1000,Math.max(Math.abs(x),Math.abs(y))*.005);
+ const rate=rows.rates.length?[...rows.rates].sort((a,b)=>b.score-a.score)[0].value:null;
+
+ let b=best(rows.before)?.value??null;
+ let v=best(rows.vat)?.value??null;
+ let a=best(rows.after)?.value??null;
+
+ // Amount-in-words final amount is authoritative if it exists.
+ const words=findAmountInWords(allText)||findAmountInWords(primary)||findAmountInWords(secondary);
+ const wordValue=parseVietnameseMoneyWords(words);
+ if(wordValue>0)a=wordValue;
+
+ // A) If explicit PRE-VAT + VAT exist, their sum is the final total.
+ if(b!=null&&v!=null)a=b+v;
+
+ // B) If final total + VAT rate exist, derive PRE-VAT and VAT exactly.
+ if(a!=null&&rate!=null&&rate>0&&rate<100){
+   const derivedBefore=Math.round(a/(1+rate/100));
+   const derivedVat=a-derivedBefore;
+   // Do not let an OCR fragment replace a value that reconciles with the triangle.
+   if(b==null || !close(b,derivedBefore)) b=derivedBefore;
+   if(v==null || !close(v,derivedVat)) v=derivedVat;
+ }
+
+ // C) If final + PRE-VAT exist, VAT is the exact difference.
+ if(a!=null&&b!=null&&a>=b){
+   const derivedVat=a-b;
+   if(v==null || !close(v,derivedVat)) v=derivedVat;
+ }
+
+ // D) If PRE-VAT + VAT rate exist, calculate the final.
+ if(b!=null&&rate!=null&&rate>0&&rate<100){
+   const derivedVat=Math.round(b*rate/100);
+   if(v==null || !close(v,derivedVat)) v=derivedVat;
+   a=b+v;
+ }
+
+ // E) Use the item subtotal ONLY if it is complete enough and reconciles.
+ // This prevents a scanned table where OCR catches only 1 of 2 rows from
+ // overwriting the true subtotal.
+ let itemEvidence='Không dùng tổng hạng mục để ghi đè số tổng.';
+ if(itemSum>0){
+   const itemVsBefore = b!=null ? close(itemSum,b) : false;
+   const itemVsAfter = a!=null ? (itemSum<=a && close(itemSum,a-(v||0))) : false;
+   const impliedVat = a!=null && a>=itemSum ? a-itemSum : null;
+   const impliedRate = impliedVat!=null && itemSum>0 ? impliedVat/itemSum*100 : null;
+   const plausible = impliedVat!=null && impliedVat>=0 && impliedVat<=a*0.30 &&
+                     (impliedRate==null || (impliedRate>0 && impliedRate<=30));
+
+   if(itemVsBefore || itemVsAfter || (itemCount>=2 && b==null && plausible)){
+     b=itemSum;
+     if(a!=null && a>=b){
+       v=a-b;
+       if(rate==null && b>0) rate=Math.round((v/b*100)*100)/100;
+     }else if(rate!=null){
+       v=Math.round(b*rate/100);
+       a=b+v;
+     }
+     itemEvidence=`Đã dùng tổng ${itemCount} hạng mục đã xác nhận (${fmt(itemSum)}) vì khớp phép tính tài chính.`;
+   }else{
+     itemEvidence=`Không dùng ${fmt(itemSum)} làm tổng Trước VAT vì danh sách hạng mục có thể chưa đọc đủ.`;
+   }
+ }
+
+ // F) Final deterministic triangle.
+ if(b!=null&&v!=null)a=b+v;
+ else if(a!=null&&b!=null)v=a-b;
+ else if(a!=null&&v!=null)b=a-v;
+ else if(b!=null&&rate!=null){v=Math.round(b*rate/100);a=b+v;}
+ else if(a!=null&&rate!=null){b=Math.round(a/(1+rate/100));v=a-b;}
+
+ const totalMatches=(b!=null&&v!=null&&a!=null)?Math.abs(b+v-a)<=1:null;
+ const vatMatches=(b!=null&&v!=null&&rate!=null)?Math.abs(v-b*rate/100)<=1:null;
+ const itemsMatch=itemSum>0&&b!=null?Math.abs(itemSum-b)<=Math.max(1000,itemSum*.005):null;
+
+ return {
+   before:b,vat:v,after:a,vatRate:rate,totalMatches,vatMatches,
+   itemsMatchTotal:itemsMatch,itemSum,
+   evidence:{
+     before:best(rows.before),vat:best(rows.vat),after:best(rows.after),
+     rates:rows.rates,amountWords:wordValue||null,itemCount,itemEvidence,
+     rule:'V58 TABLE READER: explicit summary → amount in words → arithmetic triangle → validated item subtotal only when reconciled'
+   }
+ };
+}
+
+function extractQuotationSummaryRowsUniversal(text){
+ const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+ let before=null,vat=null,after=null;
+ const money=s=>{
+   const ns=numericTokens(String(s||'')).filter(x=>x.value>=1000&&x.value<1e13);
+   return ns.length?ns.at(-1).value:null;
+ };
+ const norm=s=>stripVN(String(s||'').toLowerCase()).replace(/\s+/g,' ').replace(/[：:]/g,' ').trim();
+ const hasMoney=s=>money(s)!=null;
+ const isFinancialLabel=s=>{
+   const x=norm(s);
+   return /^(?:\d+[.)-]?\s*)?(?:tong|cong|thue|vat|gtgt|thanh tien|thanh toan)(?:\s+.*)?$/i.test(x);
+ };
+
+ // IMPORTANT: summary labels are interpreted semantically, not by position.
+ // This covers common Vietnamese quotation variants such as:
+ // "Tổng tiền tạm tính", "Tổng tiền trước thuế", "Tổng cộng trước VAT",
+ // "Thuế VAT", "Tiền thuế", "Tổng cộng sau thuế", "Thành tiền".
+ const classify=(s)=>{
+   const x=norm(s);
+   const before=(
+     /\b(?:tong\s+(?:tien\s+)?tam\s+tinh)\b/.test(x) ||
+     /\b(?:tong\s+(?:tien\s+)?(?:truoc|chua)\s+(?:vat|thue))\b/.test(x) ||
+     /\b(?:cong\s+(?:truoc|chua)\s+(?:vat|thue))\b/.test(x) ||
+     /\bsubtotal\b/.test(x) ||
+     /\b(?:tong|cong)\s+hang\s+muc\b/.test(x)
+   );
+   const vat=(
+     /\b(?:thue\s+(?:vat|gtgt)|tien\s+thue)\b/.test(x) ||
+     /^(?:vat|gtgt)(?:\s+|$)/.test(x)
+   );
+   const after=(
+     /\b(?:tong\s+(?:cong\s+)?(?:sau|da\s+co)\s+(?:vat|thue)|tong\s+(?:cong\s+)?(?:thanh\s+toan|phai\s+tra))\b/.test(x) ||
+     /\bgrand\s+total\b/.test(x) ||
+     /^thanh\s+tien$/.test(x) ||
+     /^thanh\s+toan$/.test(x)
+   );
+   return {before,vat,after};
+ };
+
+ // Pass 1: exact/strong financial labels. Strong rows always beat generic rows.
+ const strong=[];
+ for(let i=0;i<lines.length;i++){
+   const raw=lines[i], cls=classify(raw), val=money(raw), next=money(lines[i+1]||'');
+   if(cls.before||cls.vat||cls.after){
+     let v=val, source=raw;
+     if(v==null && next!=null){ v=next; source=lines[i+1]; }
+     if(v!=null){
+       const score=cls.after||cls.before||cls.vat ? 200 : 0;
+       strong.push({kind:cls.after?'after':cls.vat?'vat':'before',value:v,score,source});
+     }
+   }
+ }
+ // Choose the strongest explicit occurrence for each field.
+ for(const k of ['before','vat','after']){
+   const arr=strong.filter(x=>x.kind===k).sort((a,b)=>b.score-a.score);
+   if(arr.length){
+     if(k==='before') before=arr[0].value;
+     if(k==='vat') vat=arr[0].value;
+     if(k==='after') after=arr[0].value;
+   }
+ }
+
+ // Pass 2: table/pipe layouts where label and amount are reconstructed separately.
+ for(let i=0;i<lines.length;i++){
+   const raw=lines[i], x=norm(raw);
+   const parts=raw.split(/\s*\|\s*/).map(v=>v.trim()).filter(Boolean);
+   if(parts.length>=2){
+     for(let j=0;j<parts.length;j++){
+       const cls=classify(parts[j]);
+       if(!(cls.before||cls.vat||cls.after)) continue;
+       const candidates=[];
+       for(let z=j+1;z<parts.length;z++){ const mv=money(parts[z]); if(mv!=null)candidates.push(mv); }
+       if(candidates.length){
+         const v=candidates.at(-1);
+         if(cls.after && after==null) after=v;
+         if(cls.vat && vat==null) vat=v;
+         if(cls.before && before==null) before=v;
+       }
+     }
+   }
+   // A label on one line followed by a single financial value on the next line.
+   const cls=classify(raw);
+   if(cls.before||cls.vat||cls.after){
+     for(let j=i+1;j<=Math.min(i+2,lines.length-1);j++){
+       const nx=lines[j];
+       if(classify(nx).before||classify(nx).vat||classify(nx).after) break;
+       const mv=money(nx);
+       if(mv!=null){
+         if(cls.after && after==null) after=mv;
+         if(cls.vat && vat==null) vat=mv;
+         if(cls.before && before==null) before=mv;
+         break;
+       }
+     }
+   }
+ }
+
+ // Pass 3: legacy generic labels, but only when no strong value exists.
+ for(let i=0;i<lines.length;i++){
+   const raw=lines[i], x=norm(raw), val=money(raw), next=money(lines[i+1]||'');
+   if(before==null && /^(?:tong|cong)$/.test(x) && val!=null) before=val;
+   if(vat==null && /^(?:vat|gtgt)$/.test(x) && val!=null) vat=val;
+   if(after==null && /^(?:thanh tien|thanh toan)$/.test(x) && val!=null) after=val;
+   if(before==null && /^(?:tong|cong)$/.test(x) && val==null && next!=null) before=next;
+   if(vat==null && /^(?:vat|gtgt)$/.test(x) && val==null && next!=null) vat=next;
+   if(after==null && /^(?:thanh tien|thanh toan)$/.test(x) && val==null && next!=null) after=next;
+ }
+
+ // "Bằng chữ" is independent confirmation of the final payable amount.
+ const words=findAmountInWords(lines.join('\n'));
+ if(after==null && words){ const w=parseVietnameseMoneyWords(words); if(w!=null) after=w; }
+ return {before,vat,after};
+}
+
+function findDateUniversal(text){const m=String(text||'').match(/\b([0-3]?\d)[\/.-]([0-1]?\d)[\/.-](20\d{2})\b/);if(m)return `${String(m[1]).padStart(2,'0')}/${String(m[2]).padStart(2,'0')}/${m[3]}`;const v=String(text||'').match(/(?:ngay|ngày)\s+([0-3]?\d)\s+(?:thang|tháng)\s+([0-1]?\d)\s+(?:nam|năm)\s+(20\d{2})/i);return v?`${String(v[1]).padStart(2,'0')}/${String(v[2]).padStart(2,'0')}/${v[3]}`:'';}
+function findVatRateUniversal(text){const s=String(text||'');const m=s.match(/(?:VAT|GTGT|thuế\s*(?:VAT|GTGT)|thuế\s*giá\s*trị\s*gia\s*tăng)[^%\d]{0,30}(\d+(?:[.,]\d+)?)\s*%/i)||s.match(/(\d+(?:[.,]\d+)?)\s*%[^\n]{0,30}(?:VAT|GTGT|thuế)/i);return m?Number(String(m[1]).replace(',','.')):null;}
+function findAmountInWords(text){const m=String(text||'').match(/(?:bằng chữ|bang chu|số tiền bằng chữ|so tien bang chu)\s*[:\-|]?\s*([^\n]+)/i);return m?m[1].trim():'';}
+function findContextUniversal(text,labels){const lines=String(text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean),ordered=[...labels].sort((a,b)=>String(b).length-String(a).length);for(let i=0;i<lines.length;i++){const raw=lines[i],norm=stripVN(raw.toLowerCase()),hit=ordered.find(x=>norm.includes(stripVN(String(x).toLowerCase())));if(!hit)continue;const h=stripVN(String(hit).toLowerCase()),pos=norm.indexOf(h);let value=pos>=0?norm.slice(pos+h.length).replace(/^\s*[:|\-–—]?\s*/,'').trim():'';if(!value){for(let j=1;j<=2&&i+j<lines.length;j++){const nxt=lines[i+j].trim();if(nxt&&!/^(thanh toan|payment|payment terms|vat|tong|cong|ghi chu|notes)$/i.test(stripVN(nxt))){value=nxt;break;}}}if(value&&value.length<600)return value;}return '';}
+function cleanWarranty(v){let x=String(v||'').trim().replace(/(?:,|;|\.|\s)*(?:số|so|hotline|điện thoại|dien thoai)\s*(?:hotline)?\s*[:\-]?\s*0\d[\d.\s-]{7,}/ig,'').replace(/(?:,|;|\s)+0\d[\d.\s-]{7,}/g,'').trim();const m=x.match(/\b\d{1,3}\s*(?:ngày|tháng|năm|ngay|thang|nam)\b/i);return m&&x.length>80?m[0]:x;}
+
+function buildItemComparison(c){
+ const qs=c.quotes||[];
+ const groups=[];
+ for(const q of qs){
+   for(const i of (q.items||[])){
+     const raw=String(i[0]||'').trim(); if(!raw)continue;
+     const key=normalizeItemName(raw);
+     let g=groups.find(x=>itemSimilar(x.key,key));
+     if(!g){g={key,label:raw,values:{}};groups.push(g)}
+     g.values[q.name]={raw,qty:Number(i[1])||0,unit:Number(i[2])||0,total:Number(i[3])||0};
+   }
+ }
+ if(!groups.length)return '<div class="empty">Chưa có đủ dữ liệu dòng hạng mục để đối chiếu.</div>';
+ let html='<table class="table"><thead><tr><th>Nhóm hạng mục</th>' + qs.map(q=>'<th>'+esc(q.name)+'</th>').join('') + '<th>Kiểm tra</th></tr></thead><tbody>';
+ for(const g of groups){
+   const vals=qs.map(q=>g.values[q.name]);
+   const present=vals.filter(Boolean).length;
+   const qtys=vals.filter(Boolean).map(v=>v.qty).filter(v=>v>0);
+   const qtySame=qtys.length<=1||qtys.every(v=>v===qtys[0]);
+   const msg=present===qs.length?(qtySame?'✓ Có ở tất cả NCC; số lượng tương đồng.':'⚠ Có ở tất cả NCC nhưng số lượng khác nhau.'):'⚠ Chỉ có '+present+'/'+qs.length+' NCC; cần xác minh phạm vi.';
+   html+='<tr><td><b>'+esc(g.label)+'</b></td>'+vals.map(v=>v?'<td>'+esc(v.raw)+'<br>SL '+v.qty+' · ĐG '+fmt(v.unit)+' · TT '+fmt(v.total)+'</td>':'<td>— Không thấy</td>').join('')+'<td>'+msg+'</td></tr>';
+ }
+ html+='</tbody></table>'; return html;
+}
+function itemSimilar(a,b){
+ if(a===b)return true;
+ const stop=new Set(['cang','xe','double','ty','phot','phut','bac','trượt','truot','cong','sua','lap','dat','cua','dich','vu','thuc','hien']);
+ const A=new Set(a.split(' ').filter(x=>x.length>=4&&!stop.has(x)));
+ const B=new Set(b.split(' ').filter(x=>x.length>=4&&!stop.has(x)));
+ let common=0; A.forEach(x=>{if(B.has(x))common++});
+ return common>=2 && common/Math.max(1,Math.min(A.size,B.size))>=0.5;
+}
+
+const CASE_TEMPLATES={
+ cleaning:{type:'Dịch vụ',title:'Dịch vụ giặt thảm / vệ sinh',scope:'Hạng mục, ĐVT, số lượng, đơn giá, thành tiền, trước VAT, VAT, sau VAT, thời gian, bảo hành, thanh toán, phạm vi, hóa chất/máy móc.'},
+ forklift:{type:'Sửa chữa',title:'Sửa chữa xe nâng / thiết bị',scope:'Linh kiện/hạng mục, quy cách, ĐVT, SL, đơn giá, thành tiền, tổng trước/sau VAT, thời gian, bảo hành, hiệu lực, thanh toán, địa điểm, phát sinh.'},
+ pest:{type:'Dịch vụ',title:'Dịch vụ kiểm soát côn trùng',scope:'Khu vực/diện tích, tần suất, hạng mục xử lý, hóa chất/hoạt chất, thiết bị, thời gian đáp ứng, bảo hành, báo cáo, giá/lần, giá tháng/năm, VAT.'},
+ maintenance:{type:'Bảo trì',title:'Bảo trì / kiểm định',scope:'Thiết bị, model/quy cách, SL, tần suất, nội dung, đơn giá, thành tiền, vật tư thay thế, thời gian đáp ứng, bảo hành, hồ sơ/chứng chỉ, VAT.'},
+ procurement:{type:'Mua sắm',title:'Mua sắm hàng hóa / vật tư',scope:'Tên hàng, mã/model, quy cách/spec, hãng/xuất xứ, ĐVT, SL, đơn giá, thành tiền, VAT, giao hàng, bảo hành, hiệu lực, thanh toán.'},
+ outsourcing:{type:'Thuê ngoài',title:'Thuê ngoài dịch vụ',scope:'Phạm vi dịch vụ, nhân sự/ca, thời gian, sản lượng, đơn giá, phí tháng, tăng ca/phụ phí, thay thế nhân sự, SLA, bảo hành/khắc phục, thanh toán, VAT.'},
+ custom:{type:'Khác',title:'',scope:''}
+};
+function applyTemplateToForm(){
+ const k=document.getElementById('fTemplate')?.value||'custom', t=CASE_TEMPLATES[k]||CASE_TEMPLATES.custom;
+ if(t.title && !document.getElementById('fTitle').value.trim()) document.getElementById('fTitle').value=t.title;
+ if(t.type) document.getElementById('fType').value=t.type;
+ document.getElementById('fScope').value=t.scope||'';
+}
+
+
+function openNewCase(){
+ const m=document.getElementById('modal');
+ m.classList.remove('hidden');
+ document.getElementById('fDate').value=new Date().toISOString().slice(0,10);
+ document.getElementById('fTitle').value='';
+ document.getElementById('fSuppliers').value=3;
+ document.getElementById('fStatus').value='Bản nháp';
+ document.getElementById('fNote').value='';
+ document.getElementById('fTemplate').value='custom';
+ document.getElementById('fScope').value='';
+ document.getElementById('fFiles').value='';
+ setTimeout(()=>document.getElementById('fTitle').focus(),50);
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+}
+function closeModal(){document.getElementById('modal').classList.add('hidden')}
+async function createCase(){
+ const title=document.getElementById('fTitle').value.trim();
+ if(!title){alert('Vui lòng nhập Tên hạng mục / yêu cầu.');return}
+ const date=document.getElementById('fDate').value||new Date().toISOString().slice(0,10);
+ const d=new Date(date+'T00:00:00'), y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0');
+ const prefix=`QTC-${y}-${m}-`;
+ const nums=cases.filter(c=>c.id.startsWith(prefix)).map(c=>Number(c.id.split('-').pop())).filter(Boolean);
+ const n=(nums.length?Math.max(...nums):0)+1;
+ const c={
+   id:prefix+String(n).padStart(3,'0'),
+   title,date,
+   type:document.getElementById('fType').value,
+   suppliers:Number(document.getElementById('fSuppliers').value)||1,
+   status:document.getElementById('fStatus').value,
+   note:document.getElementById('fNote').value.trim(),
+   template:document.getElementById('fTemplate').value,
+   scope:document.getElementById('fScope').value.trim(),
+   supplierNames:[],quotes:[],selectedSupplier:'',selectedSupplierIndex:null,contract:{enabled:false,signed:false,supplier:''}
+ };
+ cases.push(c);save();
+ const initialFiles=[...(document.getElementById('fFiles')?.files||[])];
+ closeModal();showLibrary();openCase(c.id);
+ // Nếu đã chọn file ngay khi tạo hồ sơ, hệ thống đọc luôn — upload không còn chỉ để lưu.
+ if(initialFiles.length){
+   setTimeout(async()=>{
+     const btn=[...document.querySelectorAll('.tab')].find(x=>x.textContent.includes('② Hồ sơ & báo giá')); if(btn) tab(btn,'docs');
+     const progress=document.getElementById('uploadProgress');
+     await analyzeFilesForCase(c.id,initialFiles,progress);
+     openCase(c.id);
+     const aiBtn=[...document.querySelectorAll('.tab')].find(x=>x.textContent.includes('③ AI đọc dữ liệu')); if(aiBtn) tab(aiBtn,'ai');
+   },100);
+ } else {
+   setTimeout(()=>{
+     const btn=[...document.querySelectorAll('.tab')].find(x=>x.textContent.includes('② Hồ sơ & báo giá'));
+     if(btn) tab(btn,'docs');
+   },50);
+ }
+}
+showLibrary();
+
+document.getElementById('modal').addEventListener('click',function(e){
+ if(e.target===this) closeModal();
+});
+document.addEventListener('keydown',function(e){
+ if(e.key==='Escape' && !document.getElementById('modal').classList.contains('hidden')) closeModal();
+});
+</script>
+</body>
+</html>
